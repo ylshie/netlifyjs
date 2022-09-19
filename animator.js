@@ -1,5 +1,5 @@
 import * as Kalidokit from "./Kalidokit"
-import * as xxx from "./sdk/build/araisdk.dm.js"
+import * as xxx from "./sdk/build/araisdk.js"
 
 //import {GLTFLoader} from "./libs/GLTFLoader.js"
 //Import Helper Functions from Kalidokit
