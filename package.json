@@ -1,0 +1,34 @@
+{
+  "name": "metawavebodyar",
+  "version": "1.0.0",
+  "description": "MetaWave Body AR",
+  "scripts": {
+    "clean-dist": "rm -rf dist && mkdir dist && cd dist && mkdir assets",
+    "copy-assets": "cp -r ./assets/* ./dist/assets",
+    "init": "npm run clean-dist && npm run copy-assets",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npm run copy-assets && npx parcel index.html",
+    "build": "npm run init && npx parcel build index.html",
+    "watch": "webpack --watch --config webpack.config.dev.cjs",
+    "sdk": "webpack --config webpack.config.prod.cjs"
+  },
+  "author": "KuoYeh",
+  "license": "ISC",
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.7.0",
+    "buffer": "^6.0.3",
+    "parcel-bundler": "^1.12.3",
+    "process": "^0.11.10",
+    "sass": "^1.54.9",
+    "webpack": "^5.24.3",
+    "webpack-cli": "^4.5.0"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1",
+    "mind-ar": "^1.1.5",
+    "parcel": "^2.0.0",
+    "three": "^0.144.0",
+    "webpack": "^5.24.3",
+    "webpack-cli": "^4.5.0"
+  }
+}

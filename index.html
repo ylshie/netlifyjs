@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--<script src="./libs/three.js-r132/build/three.js">
+    window.THREE = THREE;
+    </script>-->
+    
+    <script src="https://unpkg.com/three@0.133.0/build/three.js"></script>
+    <!--     GLTF Loader for Three.js -->
+    <script src="https://unpkg.com/three@0.133.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!--     Orbit Controls for Three.js -->
+    <script src="https://unpkg.com/three@0.133.0/examples/js/controls/OrbitControls.js"></script>
+    <!--     VRM Loader for Three.js -->
+    <script src="https://unpkg.com/@pixiv/three-vrm@0.6.7/lib/three-vrm.js"></script>
+    
+
+    <!--<script src="./libs/three.js-r132/examples/jsm/renderers/CSS3DRenderer.js" type="module"></script>-->
+    <!--<script src="./libs/CSS3DRenderer.js" type="module"></script>-->
+    <!--<script src="./libs/mindar/mindar-image-three.prod.js"></script>-->
+    <!--<script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.5/dist/mindar-image-three.prod.js"></script>-->
+    <!--<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>-->
+    <script src="./animator.js" type="module"></script>
+    <!--
+      <script src="./drawing_utils.js" crossorigin="anonymous"></script>
+      <script src="./camera_utils.js" crossorigin="anonymous"></script> 
+      <script src="./holistic.js" crossorigin="anonymous"></script>
+    -->
+    <!--<script src="sdk.js" type="module"></script>-->
+    <style>
+      html, body {position: relative; margin: 0; width: 100%; height: 100%; overflow: hidden}
+    </style>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <a class="abs logo" href="https://metawave.click" target="_blank">
+      <div style="display: flex;align-items: center;bottom: 0;right: 10px;">
+        <img class="logo" src="logo.png" alt="" style="
+          height: 50px;">
+        <span class="title">MetaWave AI Lab</span>
+      </div>
+    </a>
+    <canvas class="output_canvas" width="1280px" height="720px"></canvas>
+  </body>
+</html>
