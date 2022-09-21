@@ -1,15 +1,15 @@
 
-import {Holistic} from "./libs/mediapipe/holistic"
+import {Holistic,POSE_CONNECTIONS, FACEMESH_TESSELATION, HAND_CONNECTIONS} from "./libs/mediapipe/holistic"
 import {Camera} from "./libs/mediapipe/camera_utils";
-import {drawConnectors, drawLandmarks, POSE_CONNECTIONS, FACEMESH_TESSELATION, HAND_CONNECTIONS} from "./libs/mediapipe/drawing_utils"
-import startMindAR from "./libs/sdk_ar.js"
+import {drawConnectors, drawLandmarks} from "./libs/mediapipe/drawing_utils"
+import startMindAR from "./sdk_ar.js"
+
+const model = "./assets/models/musicband-raccoon/scene.gltf";
 
 class araiSDK {
       create_camera(videoElement) {
         const camera = new Camera(videoElement, {
             onFrame: async () => {
-                //console.log("got image");
-                
                 await this.holistic.send({ image: videoElement });
             },
             width: 640,
@@ -44,10 +44,26 @@ class araiSDK {
             }
         };
 
+        const data_file_map = {
+            assets_loader_js: "assets_loader.js", // holistic_solution_packed_assets_loader.js
+            assets_data: "assets.data", // holistic_solution_packed_assets.data
+            simd_wasm_bin_js: "simd_wasm_bin.js", // holistic_solution_simd_wasm_bin.js
+            simd_wasm_bin_wasm: "simd_wasm_bin.wasm", // holistic_solution_simd_wasm_bin.wasm
+            wasm_bin_wasm: "wasm_bin.wasm", // holistic_solution_wasm_bin.wasm
+            binarypb: "_.binarypb", // holistic.binarypb
+            full_tflite: "pose_landmark_full.tflite", // pose_landmark_full.tflite
+            heavy_tflite: "pose_landmark_heavy.tflite", // pose_landmark_heavy.tflite
+            lite_tflite: "pose_landmark_lite.tflite" // pose_landmark_lite.tflite
+        }
+
         this.holistic = new Holistic({
             locateFile: (file) => {
-              console.log("holistic load file " + file)
-                return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
+                var real_file = data_file_map[file];
+
+                console.log("load file " + file + " from " + real_file)
+                //return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
+
+                return `./assets/data/${file}`;
             },
         });
 

@@ -1,18 +1,12 @@
 import * as Kalidokit from "./Kalidokit"
-import * as xxx from "./sdk/build/araisdk.dm.js"
+//import * as xxx from "./sdk/build/araisdk.prod"
+import * as xxx from "./sdk/build/araisdk.dm"
 
 //import {GLTFLoader} from "./libs/GLTFLoader.js"
 //Import Helper Functions from Kalidokit
 const remap = Kalidokit.Utils.remap;
 const clamp = Kalidokit.Utils.clamp;
 const lerp = Kalidokit.Vector.lerp;
-/*
-export const animateVRM = (vrm, results) => {
-    return function () {
-        console.log("got animated");
-    }
-}
-*/
 
 let x = xxx;
 /* THREEJS WORLD SETUP */
