@@ -1,6 +1,13 @@
 import * as Kalidokit from "./Kalidokit"
-//import * as xxx from "./sdk/build/araisdk.prod"
-import * as xxx from "./sdk/build/araisdk.dm"
+import * as xxx from "./sdk/build/araisdk.prod"
+//import * as xxx from "./sdk/build/araisdk.dm"
+
+const url = new URL(window.location);
+let msg = url.searchParams.get('message'); // => 'hello'
+if (msg) 
+    console.log("message is " + msg);
+else
+    console.log("no message");
 
 //import {GLTFLoader} from "./libs/GLTFLoader.js"
 //Import Helper Functions from Kalidokit
@@ -25,13 +32,15 @@ document.body.appendChild(renderer.domElement);
 
 // camera
 const orbitCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
-orbitCamera.position.set(0.0, 1.4, 0.7);
+orbitCamera.position.set(0.0, 0.0, 3.0);
+//orbitCamera.position.set(0.0, 1.4, 0.7);
 
 // controls
 //arthur
 const orbitControls = new THREE.OrbitControls(orbitCamera, renderer.domElement);
 orbitControls.screenSpacePanning = true;
-orbitControls.target.set(0.0, 1.4, 0.0);
+orbitControls.target.set(0.0, 1.0, 0.0);
+//orbitControls.target.set(0.0, 1.4, 0.0);
 orbitControls.update();
 
 // scene
@@ -177,13 +186,16 @@ const animateVRM = (vrm, results) => {
     //console.log(results.rightHandLandmarks)
     let videoElement = document.querySelector("video");
 
-    if (videoElement.style.width > videoElement.style.height) {
+    console.log(" " + videoElement.width + "x" + videoElement.height);
+    /*
+    if (screen.width > screen.height) {
         videoElement.style.width = 320;
         videoElement.style.height = 240;
     } else {
         videoElement.style.width = 240;
         videoElement.style.height = 320;
     }
+    */
     videoElement.style.position = 'fixed';
     videoElement.style.right = '10px';
     videoElement.style.bottom = '10px';
@@ -292,8 +304,8 @@ const animateVRM = (vrm, results) => {
         old_rightHandLandmarks = rightHandLandmarks;
     }
     if (old_rightHandLandmarks) {
-        console.log("pos right hannd")
-        console.log(rightHandLandmarks)
+        //console.log("pos right hannd")
+        //console.log(rightHandLandmarks)
         riggedRightHand = Kalidokit.Hand.solve(old_rightHandLandmarks, "Right");
         rigRotation("RightHand", {
             // Combine Z axis from pose hand and X/Y axis from hand wrist rotation

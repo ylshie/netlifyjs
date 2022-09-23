@@ -2,20 +2,23 @@
 import {Holistic,POSE_CONNECTIONS, FACEMESH_TESSELATION, HAND_CONNECTIONS} from "./libs/mediapipe/holistic"
 import {Camera} from "./libs/mediapipe/camera_utils";
 import {drawConnectors, drawLandmarks} from "./libs/mediapipe/drawing_utils"
-import startMindAR from "./sdk_ar.js"
+import {loadModel, startMindAR} from "./sdk_ar.js"
 
-const model = "./assets/models/musicband-raccoon/scene.gltf";
+const modelPath = "./assets/models/musicband-raccoon/scene.gltf";
 
 class araiSDK {
-      create_camera(videoElement) {
-        const camera = new Camera(videoElement, {
-            onFrame: async () => {
-                await this.holistic.send({ image: videoElement });
-            },
-            width: 640,
-            height: 480,
-        });
-        camera.start();
+    create_camera(videoElement) {
+      console.log("create camera");
+      var self = this;
+      const camera = new Camera(videoElement, {
+          onFrame: async () => {
+              await this.holistic.send({ image: videoElement });
+          },
+          width: 640,
+          height: 480,
+      });
+      this.start_time = Date.now();
+      camera.start();
     }
     hook_video() {
       var self = this;
@@ -32,6 +35,7 @@ class araiSDK {
     
     constructor() {
         this.onCallback = null;
+        loadModel(modelPath)
     
         const onResults = (results) => {
         // console.log("onResult")
@@ -85,6 +89,24 @@ class araiSDK {
         let videoElement = document.querySelector("video");
         let canvasElement = document.querySelector('.output_canvas');
         let canvasCtx = canvasElement.getContext('2d');
+
+        this.currnt_time = Date.now();
+
+        var offset = this.currnt_time - this.start_time;
+        var record = {offset: offset}
+        if (results.poseLandmarks) {
+          record.pose = "pos" //results.poseLandmarks;
+        }
+        if (results.faceLandmarks) {
+          record.face = "face" //results.faceLandmarks;
+        }
+        if (results.rightHandLandmarks) {
+          record.right = "right" //results.rightHandLandmarks;
+        }
+        if (results.leftHandLandmarks) {
+          record.left = "left" //results.leftHandLandmarks;
+        }
+        console.log(record);
 
         canvasElement.style.width = videoElement.style.width;
         canvasElement.style.height = videoElement.style.height;
