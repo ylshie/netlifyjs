@@ -2368,16 +2368,16 @@
 		this.g = new Hc({
 			locateFile: a.locateFile,
 			files: [{
-				url: "holistic_solution_packed_assets_loader.js"
+				url:  "holistic_solution_packed_assets_loader.js" // "assets_loader_js"
 			}, {
 				simd: !1,
-				url: "holistic_solution_wasm_bin.js"
+				url: "holistic_solution_wasm_bin.js" // "wasm_bin_js"
 			}, {
 				simd: !0,
-				url: "holistic_solution_simd_wasm_bin.js"
+				url: "holistic_solution_simd_wasm_bin.js" // "simd_wasm_bin_js"
 			}],
 			graph: {
-				url: "holistic.binarypb"
+				url: "holistic.binarypb" // "binarypb"
 			},
 			inputs: {
 				image: {
@@ -2468,13 +2468,13 @@
 								d = "";
 								switch (c) {
 									case 1:
-										d = "pose_landmark_full.tflite";
+										d = "pose_landmark_full.tflite"; // "full_tflite" 
 										break;
 									case 2:
-										d = "pose_landmark_heavy.tflite";
+										d =  "pose_landmark_heavy.tflite"; // "heavy_tflite"
 										break;
 									default:
-										d = "pose_landmark_lite.tflite"
+										d = "pose_landmark_lite.tflite"; //  "lite_tflite"
 								}
 								e = "third_party/mediapipe/modules/pose_landmark/" + d;
 								g = b.g.locateFile(d,

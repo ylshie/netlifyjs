@@ -25,15 +25,22 @@
     <script src="./sdk/libs/mediapipe/camera_utils.js" crossorigin="anonymous"></script> 
     <script src="./sdk/libs/mediapipe/holistic.js" crossorigin="anonymous"></script>
     -->
-    <script src="./animator.js" type="module"></script>
-    
     <!--<script src="sdk.js" type="module"></script>-->
+    <script src="./animator.js" type="module"></script>
     <style>
       html, body {position: relative; margin: 0; width: 100%; height: 100%; overflow: hidden}
+      #teacher_video {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 320px;
+        height: 240px;
+      }
     </style>
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
+    <!--<video id="teacher_video" src="./assets/mock-videos/dance.mp4"></video>-->
     <!--
     <div id="root"></div>
     <script src="./index.js" type="module"></script>
@@ -45,6 +52,8 @@
         <span class="title">MetaWave AI Lab</span>
       </div>
     </a>
-    <canvas class="output_canvas" width="1280px" height="720px"></canvas>
+    <canvas class="output_canvas" width="1000px" height="720px" left="300px"></canvas>
   </body>
+  <!--<script src="./araisdk.prod.js" type="module"></script>-->
+  
 </html>

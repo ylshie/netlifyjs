@@ -7,7 +7,7 @@ module.exports = {
   mode: 'production',
   output: {
     filename: '[name].prod.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'sdk/build'),
     publicPath: ''
   },
   devtool: 'source-map',

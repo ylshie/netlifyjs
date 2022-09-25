@@ -43,6 +43,15 @@ const mindarThree = new window.MINDAR.IMAGE.MindARThree({
   uiLoading: "no",
 });
 
+var sourceVideo = null;
+var sourceDuration = 0;
+export function getSourceVideo() {
+  return sourceVideo;
+}
+export function getSourceDuration() {
+  return sourceDuration;
+}
+
 export function startMindAR() {
   //  
     const {renderer, scene, camera} = mindarThree;
@@ -62,47 +71,6 @@ export function startMindAR() {
       anchor.group.add(raccoon.scene);
     }
 
-    /*
-    var done = false;
-    const video = document.createElement("video");
-    console.log(video);
-    const mockWithVideo = (path) => {
-      if (video) {
-        document.body.appendChild(video);
-
-        video.setAttribute('loop', '');
-        video.setAttribute("src", path);
-        video.style.position = "absolute"
-        video.style.left = 0;
-        video.style.top = 0;
-
-        const startButton = document.createElement("button");
-        
-        startButton.innerHTML = "start";
-        startButton.style.position = 'fixed';
-        startButton.style.zIndex = 10000;
-        document.body.appendChild(startButton);
-
-        startButton.addEventListener('click', () => {
-          document.body.removeChild(video);
-          document.body.removeChild(startButton);
-          video.play();
-          //document.body.removeChild(startButton);
-          //resolve(stream);
-        });
-      }
-      navigator.mediaDevices.getUserMedia = () => {
-        return new Promise((resolve, reject) => {
-          const stream = video.captureStream();
-                    
-          console.log(stream);
-
-          resolve(stream);
-        })
-      }
-    }
-    */
-
   const url = new URL(window.location);
   let videofile = url.searchParams.get('video'); // => 'hello'
   if (videofile) 
@@ -110,13 +78,39 @@ export function startMindAR() {
   else
       console.log("from webcam");
 
+  
   const start = async() => {
       if (videofile) {
           //mockWithVideo("./assets/mock-videos/face1.mp4")
-          mockWithVideo("./assets/mock-videos/" + videofile)
+          //sourceVideo = mockWithVideo("./assets/mock-videos/" + videofile)
+          sourceVideo = mockWithVideo("http://localhost:3000/" + videofile)
+          sourceDuration = sourceVideo.duration;
+          var jsonFile = "http://localhost:3000/dance.json";
+          //var json = JSON.parse(jsonFile);
+
+          var request = new XMLHttpRequest();
+          
+          request.open("GET", jsonFile, false);
+          request.onreadystatechange = function() {
+            if ( request.readyState === 4 && request.status === 200 ) {
+              console.log("json file ready")
+              var json = JSON.parse(request.responseText);
+              console.log(request.responseText);
+            }
+          }
+          request.onprogress = (event) => { 
+              connsole.log("downloaded " + event.lengthComputable + " of " + event.total)
+          }
+          request.send(null);
       }
       //} else {
       await mindarThree.start();
+      const video = document.createElement("video");
+      video.crossOrigin = "anonymous";
+      video.id = "teacher_video";
+      video.loop = true;
+      video.src = "./assets/mock-videos/dance.mp4";
+      document.body.appendChild(video);
     
       renderer.setAnimationLoop(() => {
         try {
