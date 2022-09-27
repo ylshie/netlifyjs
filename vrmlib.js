@@ -1,5 +1,5 @@
 import * as Kalidokit from "./Kalidokit"
-import * as xxx from "./sdk/build/araisdk.prod"
+//import * as xxx from "./sdk/build/araisdk.prod"
 
 class vrmlib {
 
@@ -244,6 +244,8 @@ export function updateVRM (_currentVrm,videoElement, results) {
         rigRotation(_currentVrm,"RightLittleIntermediate", riggedRightHand.RightLittleIntermediate);
         rigRotation(_currentVrm,"RightLittleDistal", riggedRightHand.RightLittleDistal);
     }
+
+    return riggedPose;
 }
 
 

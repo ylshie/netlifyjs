@@ -33,8 +33,32 @@
         position: absolute;
         left: 0px;
         top: 0px;
-        width: 320px;
-        height: 240px;
+        width: 640px;
+        height: 360px;
+        z-index: -1;
+      }
+      #left_panel {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 640px;
+        height: 100%;
+        z-index: -2;
+        /* background-color: red; */
+        background-image: url("./assets/concert_stage.jpg");
+        background-position: center;
+        background-size: cover;
+      }
+      #right_panel {
+        position: absolute;
+        left: 640px;
+        top: 0px;
+        width: calc(100% - 640px);
+        height: 100%;
+        z-index: -2;
+        background-image: url("./assets/concert_stage.jpg");
+        background-position: center;
+        background-size: cover;
       }
     </style>
     <link rel="stylesheet" href="./style.css">
@@ -45,6 +69,8 @@
     <div id="root"></div>
     <script src="./index.js" type="module"></script>
     -->
+    <div id="left_panel"></div>
+    <div id="right_panel"></div>
     <a class="abs logo" href="https://metawave.click" target="_blank">
       <div style="display: flex;align-items: center;bottom: 0;right: 10px;">
         <img class="logo" src="logo.png" alt="" style="

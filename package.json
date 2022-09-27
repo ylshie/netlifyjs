@@ -10,7 +10,8 @@
     "dev": "npm run copy-assets && npx parcel index.html",
     "build": "npm run init && npx parcel build index.html",
     "watch": "webpack --watch --config webpack.config.dev.cjs",
-    "sdk": "webpack --config webpack.config.prod.cjs"
+    "sdk": "webpack --config webpack.config.prod.cjs",
+    "full": "npm run sdk && npm run build"
   },
   "author": "KuoYeh",
   "license": "ISC",
@@ -26,7 +27,9 @@
   "dependencies": {
     "http-server": "^14.1.1",
     "mind-ar": "^1.1.5",
-    "parcel": "^2.0.0",
+    "parcel": "^2.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "three": "^0.144.0",
     "webpack": "^5.24.3",
     "webpack-cli": "^4.5.0"

@@ -1,8 +1,8 @@
 import * as Kalidokit from "./Kalidokit"
-import * as xxx from "./sdk/build/araisdk.prod"
+//import * as xxx from "./sdk/build/araisdk.prod"
 //import {currentVrm, updateVRM, loadVRM, setVRM}from "./vrmlib"
 import {updateVRM, loadVRM}from "./vrmlib"
-//import * as xxx from "./sdk/build/araisdk.dm"
+import * as xxx from "./sdk/build/araisdk.dm"
 
 const url = new URL(window.location);
 let msg = url.searchParams.get('message'); // => 'hello'
@@ -12,10 +12,6 @@ else
     console.log("no message");
 
 //import {GLTFLoader} from "./libs/GLTFLoader.js"
-//Import Helper Functions from Kalidokit
-//const remap = Kalidokit.Utils.remap;
-//const clamp = Kalidokit.Utils.clamp;
-//const lerp = Kalidokit.Vector.lerp;
 
 let x = xxx;
 /* THREEJS WORLD SETUP */
@@ -95,12 +91,34 @@ function animate() {
 }
 animate();
 
+function addGrid(scene) {
+    // each square
+    var planeW = 10; // pixels
+    var planeH = 10; // pixels 
+    var numW = 50; // how many wide (50*50 = 2500 pixels wide)
+    var numH = 50; // how many tall (50*50 = 2500 pixels tall)
+    var plane = new THREE.Mesh(
+        new THREE.PlaneGeometry( planeW*numW, planeH*numH, planeW, planeH ),
+        new THREE.MeshBasicMaterial( {
+            color: 0x000000,
+            wireframe: true
+        } )
+    );
+    var grid = new THREE.GridHelper(100, 2);
+
+    //scene.add(grid);
+    scene.add(plane);
+}
 /* VRM CHARACTER SETUP */
 
-const ashtraPath = "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981";
-//const teacherPath = "./assets/models/girl-Avatar-ok.vrm";
-const teacherPath = "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981";
+const ashtraPath = "./assets/models/girl-Avatar-ok.vrm";
+const teacherPath = "./assets/models/girl-Avatar-ok.vrm";
+//const ashtraPath = "./assets/models/Ashtra.vrm"
+//const teacherPath = "./assets/models/Ashtra.vrm"
+//const ashtraPath = "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981";
+//const teacherPath = "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981";
 
+//addGrid(sceneUser)
 loadVRM(sceneUser, ashtraPath, (vrm) => userVrm = vrm )
 loadVRM(sceneTeacher, teacherPath, (vrm) => teacherVrm = vrm )
 
@@ -129,13 +147,21 @@ function playTeacherAnimator() {
 
     var videoElement = document.querySelector("#teacher_video");
     sdk.playResult(videoElement, teacherSkeleton, (results) => {
-        animateVRM(teacherVrm, results);
+        var rig = animateVRM(teacherVrm, results);
+        if (rig) {
+            console.log("teacher")
+            console.log(rig)
+        }
     }) 
 }
 sdk.onCallback = (results) => {
     playTeacherVideo();
     adjustPanel();
-    animateVRM(userVrm, results);
+    var rig = animateVRM(userVrm, results);
+    if (rig) {
+        console.log("user")
+        console.log(rig)
+    }
     playTeacherAnimator()
     rendererUser.render(sceneUser, orbitCameraUser);
     rendererTeacher.render(sceneTeacher, orbitCameraTeacher);
@@ -173,9 +199,9 @@ function adjustPanel() {
     let videoElement = findMindARVideo();
     let videoCanvas = document.querySelector(".output_canvas");
 
-    adjustPos(videoElement, window.innerWidth / 3);
-    adjustPos(videoCanvas,  window.innerWidth / 3);
-    rendererUser.domElement.style.left = window.innerWidth / 3;
+    adjustPos(videoElement, "640px");
+    adjustPos(videoCanvas,  "640px");
+    rendererUser.domElement.style.left = "640px" //window.innerWidth / 3;
     rendererTeacher.domElement.style.left = 0;
     
     if (   ((3 * rendererUser.domElement.style.width / 2) != window.innerWidth)
@@ -186,21 +212,16 @@ function adjustPanel() {
 }
 /* VRM Character Animator */
 const animateVRM = (vrm, results) => {
-    if (null == vrm) return;
+    if (null == vrm) return null;
 
     //let videoElement = document.querySelector("video");
     let videoElement = findMindARVideo();
+
+    var rigPos = updateVRM(vrm, videoElement, results);
+    // Update model to render physics
+    vrm.update(clock.getDelta());
     
-    //adjustPanel();
-    
-///*
-    if (vrm) {
-        updateVRM(vrm, videoElement, results);
-        // Update model to render physics
-        vrm.update(clock.getDelta());
-    }
-    //renderer.render(scene, orbitCamera);
-//*/
+    return rigPos;
 };
 
 /*

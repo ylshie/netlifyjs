@@ -110,6 +110,8 @@ export function startMindAR() {
       video.id = "teacher_video";
       video.loop = true;
       video.src = "./assets/mock-videos/dance.mp4";
+      //video.width = "640px"
+      //video.height = "320px"
       document.body.appendChild(video);
     
       renderer.setAnimationLoop(() => {
