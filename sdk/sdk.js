@@ -180,7 +180,7 @@ class araiSDK {
             minTrackingConfidence: 0.7,
             refineFaceLandmarks: true,
           */
-            "selfieMode": true,
+            "selfieMode": true, //true,
             "modelComplexity": 1,
             "smoothLandmarks": true,
             "enableSegmentation": false,
@@ -329,8 +329,7 @@ class araiSDK {
         // Only overwrite missing pixels.
         canvasCtx.globalCompositeOperation = 'destination-atop';
         if (results.image) {
-          canvasCtx.drawImage(
-            results.image, 0, 0, canvasElement.width, canvasElement.height);
+          canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
         }
         canvasCtx.globalCompositeOperation = 'source-over';
           drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,

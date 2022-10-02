@@ -83,7 +83,15 @@ export function startMindAR(video_file) {
   else
       console.log("from webcam");
 
-  
+  function IsSafari() {
+    // Safari 3.0+ "[object HTMLElementConstructor]" 
+    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
+
+    console.log("IsSafari=" + (isSafari ? "yes": "no") + " user agent=" + navigator.userAgent)
+
+    return isSafari;
+  }
+
   const start = async() => {
       if (videofile) {
           //mockWithVideo("./assets/mock-videos/face1.mp4")
@@ -117,6 +125,12 @@ export function startMindAR(video_file) {
         video.crossOrigin = "anonymous";
         video.id = "teacher_video";
         video.loop = true;
+        video.controls = true;
+        if (IsSafari()) {
+            video.muted = true;
+            video.playsInline = true;
+        }
+        //video.playsinline = true;
         video.src = "./assets/mock-videos/" + video_file; //dance.mp4";
         //video.width = "640px"
         //video.height = "320px"

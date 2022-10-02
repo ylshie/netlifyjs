@@ -167,7 +167,13 @@ export function updateVRM (_currentVrm,videoElement, results) {
             runtime: "mediapipe",
             video: videoElement,
         });
+        //console.log(old_pose3DLandmarks);
+        //console.log(old_pose2DLandmarks);
+        //console.log(riggedPose);
+
         rigRotation(_currentVrm,"Hips", riggedPose.Hips.rotation, 0.7);
+        //rigPosition(_currentVrm,"Hips", riggedPose.Hips.position, 1, 0.07);
+        ///*
         rigPosition(_currentVrm,
             "Hips",
             {
@@ -178,7 +184,7 @@ export function updateVRM (_currentVrm,videoElement, results) {
             1,
             0.07
         );
-
+        //*/
         rigRotation(_currentVrm,"Chest", riggedPose.Spine, 0.25, 0.3);
         rigRotation(_currentVrm,"Spine", riggedPose.Spine, 0.45, 0.3);
 

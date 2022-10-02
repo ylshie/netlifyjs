@@ -4,8 +4,6 @@ import * as xxx from "./sdk/build/araisdk.prod"
 //import {currentVrm, updateVRM, loadVRM, setVRM}from "./vrmlib"
 import {updateVRM, loadVRM}from "./vrmlib"
 
-console.log("load animator.js");
-
 const url = new URL(window.location);
 let detect = url.searchParams.get('video'); // => 'hello'
 if (detect) 
@@ -167,10 +165,21 @@ function playTeacherVideo() {
         played = true;
         var videoElement = document.querySelector("#teacher_video");
 
-        if (videoElement)
-            videoElement.play()
-        else
+        if (null == videoElement) {
             console.log("no teacher video found")
+            return;
+        }
+        var playok = false;
+        try {
+            videoElement.play()
+            playok = true;
+        } catch(e) {
+            console.log(e);
+        } 
+        if (! playok) { // Safari
+            videoElement.muted = true;
+            videoElement.play()
+        }
     }
 }
 
@@ -197,7 +206,11 @@ sdk.onCallback = (results) => {
 
     playTeacherVideo();
     
-    animateVRM(userVrm, results);
+    if (detect) {
+        animateVRM(teacherVrm, results);
+    } else {
+        animateVRM(userVrm, results);
+    }
     playTeacherAnimator()
     rendererUser.render(sceneUser, orbitCameraUser);
     rendererTeacher.render(sceneTeacher, orbitCameraTeacher);
