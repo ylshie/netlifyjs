@@ -1,5 +1,4 @@
 import * as Kalidokit from "./Kalidokit"
-//import * as xxx from "./sdk/build/araisdk.prod"
 
 class vrmlib {
 
@@ -27,6 +26,7 @@ export function loadVRM(_scene, vrmPath, onLoaded = null) {
                     THREE.VRMUtils.removeUnnecessaryJoints(gltf.scene);
 
                     THREE.VRM.from(gltf).then((vrm) => {
+                        //vrm.scene.position.x = 0.5;
                         _scene.add(vrm.scene);
                         //currentVrm = vrm;
                         //setVRM(vrm);
@@ -52,8 +52,9 @@ export const rigRotation = (_currentVrm, name, rotation = { x: 0, y: 0, z: 0 }, 
         return;
     }
 
-    //dampener = 1;
-    //lerpAmount = 1;
+    dampener = 1;
+    lerpAmount = 1;
+
     let euler = new THREE.Euler(
         rotation.x * dampener,
         rotation.y * dampener,
@@ -73,6 +74,8 @@ export const rigPosition = (_currentVrm, name, position = { x: 0, y: 0, z: 0 }, 
     if (!Part) {
         return;
     }
+    dampener = 1;   // Arthur
+    lerpAmount = 1; // Arthur
     let vector = new THREE.Vector3(position.x * dampener, position.y * dampener, position.z * dampener);
     Part.position.lerp(vector, lerpAmount); // interpolate
 };
@@ -129,13 +132,16 @@ export function updateVRM (_currentVrm,videoElement, results) {
 
     const faceLandmarks = results.faceLandmarks;
     // Pose 3D Landmarks are with respect to Hip distance in meters
-    const pose3DLandmarks = results.ea;
+    var pose3DLandmarks = results.ea;
     // Pose 2D landmarks are with respect to videoWidth and videoHeight
     const pose2DLandmarks = results.poseLandmarks;
     // Be careful, hand landmarks may be reversed
     const leftHandLandmarks = results.rightHandLandmarks;
     const rightHandLandmarks = results.leftHandLandmarks;
 
+    if (null == results.ea) {
+        pose3DLandmarks = results.poseWorldLandmarks;
+    }
     // Animate Face
     if (faceLandmarks) {
         old_faceLandmarks = faceLandmarks;

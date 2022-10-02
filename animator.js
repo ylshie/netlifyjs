@@ -1,38 +1,38 @@
 import * as Kalidokit from "./Kalidokit"
-//import * as xxx from "./sdk/build/araisdk.prod"
+import * as xxx from "./sdk/build/araisdk.prod"
+//import * as xxx from "./sdk/build/araisdk.dm"
 //import {currentVrm, updateVRM, loadVRM, setVRM}from "./vrmlib"
 import {updateVRM, loadVRM}from "./vrmlib"
-import * as xxx from "./sdk/build/araisdk.dm"
 
 const url = new URL(window.location);
-let msg = url.searchParams.get('message'); // => 'hello'
-if (msg) 
-    console.log("message is " + msg);
+let detect = url.searchParams.get('video'); // => 'hello'
+if (detect) 
+    console.log("message is " + detect);
 else
     console.log("no message");
 
 //import {GLTFLoader} from "./libs/GLTFLoader.js"
 
-let x = xxx;
+//let x = xxx;
 /* THREEJS WORLD SETUP */
 
 //var domAnimator = null;
 
 // renderer
 const rendererUser = new THREE.WebGLRenderer({ alpha: true });
-const init_width = window.innerWidth * 2 / 3;
-const init_height = window.innerHeight;
+const init_width = window.innerWidth / 3;
+const init_height = window.innerHeight / 2;
 rendererUser.setSize(init_width, init_height);
 rendererUser.setPixelRatio(window.devicePixelRatio);
 //domAnimator = renderer.domElement;
 rendererUser.domElement.style.position = "absolute"
 rendererUser.domElement.style.left = 0;
-rendererUser.domElement.style.top = 0;
+rendererUser.domElement.style.top = window.innerHeight / 2;
 
 document.body.appendChild(rendererUser.domElement);
 
 const rendererTeacher = new THREE.WebGLRenderer({ alpha: true });
-const init_width_2 = window.innerWidth / 3;
+const init_width_2 = window.innerWidth;
 const init_height_2 = window.innerHeight;
 rendererTeacher.setSize(init_width_2, init_height_2);
 rendererTeacher.setPixelRatio(window.devicePixelRatio);
@@ -45,7 +45,7 @@ document.body.appendChild(rendererTeacher.domElement);
 
 // camera
 const orbitCameraUser = new THREE.PerspectiveCamera(35, init_width / init_height, 0.1, 1000);
-orbitCameraUser.position.set(0.0, 0.0, 4.0);
+orbitCameraUser.position.set(0.0, 1.0, 4.0);
 //orbitCamera.position.set(0.0, 1.4, 0.7);
 
 const orbitCameraTeacher = new THREE.PerspectiveCamera(35, init_width_2 / init_height_2, 0.1, 1000);
@@ -73,7 +73,8 @@ lightTeacher.position.set(1.0, 1.0, 1.0).normalize();
 sceneTeacher.add(lightTeacher);
 
 // Main Render Loop
-const clock = new THREE.Clock();
+const clock_1 = new THREE.Clock();
+const clock_2 = new THREE.Clock();
 
 let userVrm;
 let teacherVrm;
@@ -81,15 +82,17 @@ let teacherVrm;
 function animate() {
     requestAnimationFrame(animate);
     /*
-    if (currentVrm) {
+    if (teacherVrm) {
         // Update model to render physics
-        console.log("update:" + Date.now());
-        currentVrm.update(clock.getDelta());
+        //console.log("update:" + Date.now());
+        var delta = clock_2.getDelta()
+        //console.log("clock 2=" + delta)
+        teacherVrm.update(delta);
     }
-    renderer.render(scene, orbitCamera);
+    rendererUser.render(sceneUser, orbitCameraUser);
     */
 }
-animate();
+//animate();
 
 function addGrid(scene) {
     // each square
@@ -112,23 +115,49 @@ function addGrid(scene) {
 /* VRM CHARACTER SETUP */
 
 const ashtraPath = "./assets/models/girl-Avatar-ok.vrm";
-const teacherPath = "./assets/models/girl-Avatar-ok.vrm";
+//const ashtraPath = "./assets/models/ソーマ.vrm";
+const teacherPath = "./assets/models/ソーマ.vrm";
 //const ashtraPath = "./assets/models/Ashtra.vrm"
 //const teacherPath = "./assets/models/Ashtra.vrm"
 //const ashtraPath = "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981";
 //const teacherPath = "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981";
 
 //addGrid(sceneUser)
-loadVRM(sceneUser, ashtraPath, (vrm) => userVrm = vrm )
-loadVRM(sceneTeacher, teacherPath, (vrm) => teacherVrm = vrm )
+loadVRM(sceneUser, ashtraPath, (vrm) => {
+    //vrm.scene.position.x = (detect)? -0.8: 0.5;
+    userVrm = vrm 
+})
+///*
+loadVRM(sceneTeacher, teacherPath, (vrm) => {
+    teacherVrm = vrm;
+    animate();
+})
+//*/
+/*
+if (! detect) {
+    loadVRM(sceneUser, teacherPath, (vrm) => {
+        vrm.scene.position.x = -0.5;
+        teacherVrm = vrm 
+        animate();
+    })
+}
+*/
 
 var played = false;
 var sdk = new araiSDK();
 var teacherSkeleton = null;
 
-sdk.loadVideoSkeleton("./assets/mock-videos/dance.json",(json) => {
-    teacherSkeleton = json;
-});
+if (detect == null) {
+    if (sdk.loadVideoSkeleton) {
+        var json_path = "./assets/mock-videos/";
+        
+        json_path += "dance.mp4.json" // "pressmaster.mp4.json" // 
+        //console.log(json_path)
+        sdk.loadVideoSkeleton(json_path,(json) => {
+            teacherSkeleton = json;
+        });
+    }
+}
 
 function playTeacherVideo() {
     if (! played) {
@@ -143,41 +172,55 @@ function playTeacherVideo() {
 }
 
 function playTeacherAnimator() {
+    var videoElement = document.querySelector("#teacher_video");
+    if (! videoElement) return;
     if (! teacherSkeleton) return;
 
-    var videoElement = document.querySelector("#teacher_video");
+    
     sdk.playResult(videoElement, teacherSkeleton, (results) => {
         var rig = animateVRM(teacherVrm, results);
         if (rig) {
             console.log("teacher")
-            console.log(rig)
+            //console.log(rig)
         }
     }) 
 }
+sdk.onFirst = () => {
+    //playTeacherVideo();
+}
 sdk.onCallback = (results) => {
-    playTeacherVideo();
+    //return; // KILLME
     adjustPanel();
-    var rig = animateVRM(userVrm, results);
-    if (rig) {
-        console.log("user")
-        console.log(rig)
-    }
+
+    playTeacherVideo();
+    
+    animateVRM(userVrm, results);
     playTeacherAnimator()
     rendererUser.render(sceneUser, orbitCameraUser);
     rendererTeacher.render(sceneTeacher, orbitCameraTeacher);
 }
 function adjustPos(elm, pos)  {
+    let video = findMindARVideo();
+
+    var winHeight = window.innerHeight;
+    var winWidth = window.innerWidth;
+
+    var targetHeight = winHeight;
+    var targetWidth = video.videoWidth * winHeight / video.videoHeight;
+
+    pos = (winWidth - targetWidth) / 2;
+
     elm.style.position = 'absolute';
     if (screen.width > screen.height) {
-        elm.style.top = "0px";
-        elm.style.left = pos; //window.innerWidth / 3;
-        elm.style.width = "320px";
-        elm.style.height = "240px";
+        //elm.style.top = "0px";
+        elm.style.left      = pos; //window.innerWidth / 3;
+        elm.style.width     = targetWidth; //window.innerWidth * 0.9; //video.videoWidth ; //"640";//"320px";
+        elm.style.height    = targetHeight; //window.innerHeight * 0.9//video.videoHeight ; //"480px"; //"240px";
     } else {
-        elm.style.top = "0px"
-        elm.style.left = pos; //window.innerWidth / 3;
-        elm.style.width = "240px";
-        elm.style.height = "320px";
+        //elm.style.top = "0px"
+        elm.style.left      = pos; //window.innerWidth / 3;
+        elm.style.width     = targetWidth; //window.innerWidth * 0.9; //video.videoWidth ; //"640";//"320px";
+        elm.style.height    = targetHeight; //window.innerHeight * 0.9//video.videoHeight ; //"480px"; //"240px";
     }
 }
 
@@ -199,16 +242,32 @@ function adjustPanel() {
     let videoElement = findMindARVideo();
     let videoCanvas = document.querySelector(".output_canvas");
 
-    adjustPos(videoElement, "640px");
-    adjustPos(videoCanvas,  "640px");
-    rendererUser.domElement.style.left = "640px" //window.innerWidth / 3;
-    rendererTeacher.domElement.style.left = 0;
+    adjustPos(videoElement, 0); //window.innerWidth / 3 + 200);
+    adjustPos(videoCanvas,  0); //window.innerWidth / 3);
+
     
+    rendererUser.domElement.style.left = 0 //window.innerWidth / 3;
+    rendererUser.domElement.style.top = window.innerHeight / 2;
+    rendererTeacher.domElement.style.left = 0;
+    rendererTeacher.domElement.style.top = 0;
+    
+    rendererUser.setSize(window.innerWidth / 3, window.innerHeight / 2);
+    rendererTeacher.setSize(window.innerWidth, window.innerHeight)
+
+    orbitCameraUser.aspect      = (window.innerWidth / 3) / (window.innerHeight / 2);
+    orbitCameraTeacher.aspect   = window.innerWidth / window.innerHeight;
+    orbitCameraUser.updateProjectionMatrix();
+    orbitCameraTeacher.updateProjectionMatrix();
+    //const orbitCameraUser = new THREE.PerspectiveCamera(35, init_width / init_height, 0.1, 1000);
+    //const orbitCameraTeacher = new THREE.PerspectiveCamera(35, init_width_2 / init_height_2, 0.1, 1000);
+
+    /*
     if (   ((3 * rendererUser.domElement.style.width / 2) != window.innerWidth)
         || (rendererUser.domElement.style.height != window.innerHeight)) 
     {
         rendererUser.setSize(window.innerWidth * 2 / 3, window.innerHeight);
     }
+    */
 }
 /* VRM Character Animator */
 const animateVRM = (vrm, results) => {
@@ -219,7 +278,9 @@ const animateVRM = (vrm, results) => {
 
     var rigPos = updateVRM(vrm, videoElement, results);
     // Update model to render physics
-    vrm.update(clock.getDelta());
+    var delta = clock_1.getDelta();
+    //console.log("clock 1=" + delta);
+    vrm.update(delta);
     
     return rigPos;
 };

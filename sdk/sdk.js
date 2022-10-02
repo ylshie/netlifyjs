@@ -1,16 +1,22 @@
 
-import {Holistic,POSE_CONNECTIONS, FACEMESH_TESSELATION, HAND_CONNECTIONS} from "./libs/mediapipe/holistic"
+//import {Holistic,POSE_CONNECTIONS, FACEMESH_TESSELATION, HAND_CONNECTIONS} from "./libs/mediapipe/holistic"
+import {Pose, POSE_CONNECTIONS, FACEMESH_TESSELATION, HAND_CONNECTIONS} from "./libs/mediapipe/pose"
 import {Camera} from "./libs/mediapipe/camera_utils";
 import {drawConnectors, drawLandmarks} from "./libs/mediapipe/drawing_utils"
 import {loadModel, getSourceVideo} from "./sdk_ar.js"
 
 const modelPath = "./assets/models/musicband-raccoon/scene.gltf";
 
+var clock_3 = new THREE.Clock();
 class araiSDK {
+    config = {
+        usePos: true,
+    }
     loadVideoSkeleton(path, onLoaded = null) {
         var jsonFile = path; // "http://localhost:3000/dance.json";
         var request = new XMLHttpRequest();
         
+        console.log("load json from " + jsonFile)
         request.open("GET", jsonFile, false);
         request.onreadystatechange = function() {
           if ( request.readyState === 4 && request.status === 200 ) {
@@ -34,15 +40,28 @@ class araiSDK {
       var self = this;
       const camera = new Camera(videoElement, {
           onFrame: async () => {
+              if (self.firstTime) {
+                self.firstTime = false;
+                if (self.onFirst) {
+                  self.onFirst();
+                }
+              }
+              //var delta = clock_3.getDelta();
+              //console.log("clock 3 FPS=" + 1 / delta);
+              //return; // KILLME: Hack for skip detection;
               if (this.mode == "detect") {
                 //console.log("frame at " + (Date.now() - this.start_time))
-                await this.holistic.send({ image: videoElement });
+                if (this.config.usePos) {
+                    await this.pose.send({ image: videoElement });
+                } else {
+                    await this.holistic.send({ image: videoElement });
+                }
               } else {
                 this.playResult(this.sourceVideo(), this.jsonFile, this.onResults)
               }
           },
-          width: 640,
-          height: 480,
+          width: 1280, //640,  //640,
+          height: 720,  //480  //480,
       });
       this.start_time = Date.now();
       camera.start();
@@ -73,6 +92,9 @@ class araiSDK {
           if (record.poseLandmarks) {
             result.poseLandmarks = record.poseLandmarks;
           }
+          if (record.poseWorldLandmarks) {
+            result.poseWorldLandmarks = record.poseWorldLandmarks;
+          }
           if (record.ea) {
             result.ea = record.ea;
           }
@@ -93,6 +115,7 @@ class araiSDK {
     }
     constructor() {
         this.onCallback = null;
+        this.firstTime = true;
         this.first = true;
         this.jsonFile = null;
         this.tmpFile = {};
@@ -100,6 +123,10 @@ class araiSDK {
         loadModel(modelPath)
     
         this.onResults = (results) => {
+          var delta = clock_3.getDelta();
+          console.log("clock 3 FPS=" + 1 / delta);
+
+        //  return; // KILLME
         // console.log("onResult")
         // Draw landmark guides
             if (this.mode == "detect") {
@@ -126,28 +153,55 @@ class araiSDK {
             lite_tflite: "pose_landmark_lite.tflite" // pose_landmark_lite.tflite
         }
 
-        this.holistic = new Holistic({
-            locateFile: (file) => {
-                var real_file = data_file_map[file];
+        if (this.config.usePos) {
+            this.pose = new Pose({
+              locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.4/${file}`;
+              }
+            });
+        } else {
+            this.holistic = new Holistic({
+              locateFile: (file) => {
+                  var real_file = data_file_map[file];
 
-                console.log("load file " + file + " from " + real_file)
-                //return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
+                  console.log("load file " + file + " from " + real_file)
+                  //return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
 
-                return `./assets/data/${file}`;
-            },
-        });
-
-        this.holistic.setOptions({
+                  return `./assets/data/${file}`;
+              },
+            });
+        }
+        
+        const engine_options = {
+            /*
             modelComplexity: 1,
             smoothLandmarks: true,
             minDetectionConfidence: 0.7,
             minTrackingConfidence: 0.7,
             refineFaceLandmarks: true,
-        });
-
+          */
+            "selfieMode": true,
+            "modelComplexity": 1,
+            "smoothLandmarks": true,
+            "enableSegmentation": false,
+            "smoothSegmentation": true,
+            "minDetectionConfidence": 0.5,
+            "minTrackingConfidence": 0.5,
+            "effect": "background"   
+        }
+        if (this.config.usePos) {
+            this.pose.setOptions(engine_options);
+        } else {
+            this.holistic.setOptions(engine_options);
+        }
+        
         // Pass holistic a callback function
-        this.holistic.onResults(this.onResults);
-
+        //const pose = new mpPose.Pose(options);
+        if (this.config.usePos) {
+            this.pose.onResults(this.onResults);
+        } else {
+            this.holistic.onResults(this.onResults);
+        }
         this.hook_video()
       };
 
@@ -170,7 +224,7 @@ class araiSDK {
         request.send(formData);
       }
 
-      detectVideo() {
+      detectVideo(results) {
         let videoElement = document.querySelector("video");
         var srcVideo = this.sourceVideo();
         if (srcVideo == null) return;
@@ -191,7 +245,8 @@ class araiSDK {
           }, 50);
         }
       
-        if (srcVideo.currentTime >= srcVideo.duration) {
+        // TO_DO
+        if (srcVideo.currentTime >= (srcVideo.duration - 0.1)) {
           if (this.jsonFile == null) {
             this.jsonFile = this.tmpFile;
             this.tmpFile = null;
@@ -200,7 +255,17 @@ class araiSDK {
             srcVideo.pause();
             this.mode = "playback";
             srcVideo.currentTime = 0;
-            srcVideo.play();
+            //srcVideo.play(); // KILLME
+            const playButton = document.createElement("button");
+            playButton.innerHTML = "start";
+            playButton.style.position = 'fixed';
+            playButton.style.zIndex = 10000;
+            document.body.appendChild(playButton);
+
+            playButton.addEventListener('click', () => {
+              srcVideo.play();
+              document.body.removeChild(playButton);
+            });
           }
           return;
         }
@@ -212,6 +277,9 @@ class araiSDK {
           record.current = srcVideo.currentTime; //videoElement.currentTime;
         if (results.poseLandmarks) {
           record.poseLandmarks = results.poseLandmarks;
+        }
+        if (results.poseWorldLandmarks) {
+          record.poseWorldLandmarks = results.poseWorldLandmarks;
         }
         if (results.ea) {
           record.ea = results.ea;
