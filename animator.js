@@ -4,6 +4,8 @@ import * as xxx from "./sdk/build/araisdk.prod"
 //import {currentVrm, updateVRM, loadVRM, setVRM}from "./vrmlib"
 import {updateVRM, loadVRM}from "./vrmlib"
 
+console.log("load animator.js");
+
 const url = new URL(window.location);
 let detect = url.searchParams.get('video'); // => 'hello'
 if (detect) 
