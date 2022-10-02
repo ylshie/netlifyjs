@@ -131,6 +131,7 @@ loadVRM(sceneUser, ashtraPath, (vrm) => {
 })
 ///*
 loadVRM(sceneTeacher, teacherPath, (vrm) => {
+    vrm.scene.position.x = 0.5;
     teacherVrm = vrm;
     animate();
 })
