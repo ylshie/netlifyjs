@@ -60,8 +60,8 @@ class araiSDK {
                 this.playResult(this.sourceVideo(), this.jsonFile, this.onResults)
               }
           },
-          width: 1280, //640,  //640,
-          height: 720,  //480  //480,
+          width: 640, //640,  //640,
+          height: 480,  //480  //480,
       });
       this.start_time = Date.now();
       camera.start();
