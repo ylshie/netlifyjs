@@ -11,7 +11,19 @@ if (detect)
 else
     console.log("no message");
 
-//import {GLTFLoader} from "./libs/GLTFLoader.js"
+let layout = url.searchParams.get('layout'); // => 'hello'
+if (layout) 
+    console.log("layout is " + layout);
+else
+    layout = "ra"
+
+let opacity = url.searchParams.get('opacity'); // => 'hello'
+if (opacity) 
+    console.log("opacity is " + opacity);
+else
+    opacity = 0.8
+
+    //import {GLTFLoader} from "./libs/GLTFLoader.js"
 
 //let x = xxx;
 /* THREEJS WORLD SETUP */
@@ -215,6 +227,33 @@ sdk.onCallback = (results) => {
     rendererUser.render(sceneUser, orbitCameraUser);
     rendererTeacher.render(sceneTeacher, orbitCameraTeacher);
 }
+function adjustUserVideo(elm) {
+    let video = findMindARVideo();
+
+    var winHeight   = window.innerHeight;
+    var winWidth    = window.innerWidth;
+
+    var targetHeight = winHeight;
+    var targetWidth = video.videoWidth * targetHeight / video.videoHeight;
+    var posLeft = (winWidth - targetWidth) / 2;
+    var posTop  = 0;
+
+    if ((layout == "ar") || (layout == "a")) {
+        targetHeight = winHeight / 2;
+        targetWidth = video.videoWidth * targetHeight / video.videoHeight;
+        posLeft = (winWidth / 2 - targetWidth) / 2;
+        posTop = winHeight / 2;
+    }
+    if (layout == "a") {
+        elm.style.visibility = "hidden";
+    }
+
+    elm.style.position  = 'absolute';
+    elm.style.left      = posLeft
+    elm.style.top       = posTop;
+    elm.style.width     = targetWidth;
+    elm.style.height    = targetHeight
+}
 function adjustPos(elm, pos)  {
     let video = findMindARVideo();
 
@@ -253,26 +292,49 @@ function findMindARVideo() {
     return elm;
 }
 
+function adjustUserAvatar(rendererUser, orbitCameraUser) {
+    var posLeft = 0;
+    var posTop  = window.innerHeight / 2;
+    var targetWidth = window.innerWidth / 3;
+    var targetHeight = window.innerHeight / 2
+
+    if ((layout == "ar") || (layout == "a")) {
+        posTop = 0;
+        targetHeight = window.innerHeight;
+        targetWidth = window.innerWidth / 2;
+    }
+    rendererUser.domElement.style.left  = posLeft
+    rendererUser.domElement.style.top   = posTop;
+    rendererUser.setSize(targetWidth, targetHeight);
+
+    orbitCameraUser.aspect  = targetWidth / targetHeight;
+    orbitCameraUser.updateProjectionMatrix();
+}
+
 function adjustPanel() {
     //let videoElement = document.querySelector("video");
     let videoElement = findMindARVideo();
     let videoCanvas = document.querySelector(".output_canvas");
 
-    adjustPos(videoElement, 0); //window.innerWidth / 3 + 200);
-    adjustPos(videoCanvas,  0); //window.innerWidth / 3);
-
+    //adjustPos(videoElement, 0); //window.innerWidth / 3 + 200);
+    //adjustPos(videoCanvas,  0); //window.innerWidth / 3);
+    videoElement.style.visibility = "hidden"
+    videoCanvas.style.opacity = parseFloat(opacity);
+    adjustUserVideo(videoElement);
+    adjustUserVideo(videoCanvas);
     
-    rendererUser.domElement.style.left = 0 //window.innerWidth / 3;
-    rendererUser.domElement.style.top = window.innerHeight / 2;
+    adjustUserAvatar(rendererUser, orbitCameraUser)
+    //rendererUser.domElement.style.left = 0 //window.innerWidth / 3;
+    //rendererUser.domElement.style.top = window.innerHeight / 2;
     rendererTeacher.domElement.style.left = 0;
     rendererTeacher.domElement.style.top = 0;
     
-    rendererUser.setSize(window.innerWidth / 3, window.innerHeight / 2);
+    //rendererUser.setSize(window.innerWidth / 3, window.innerHeight / 2);
     rendererTeacher.setSize(window.innerWidth, window.innerHeight)
 
-    orbitCameraUser.aspect      = (window.innerWidth / 3) / (window.innerHeight / 2);
+    //orbitCameraUser.aspect      = (window.innerWidth / 3) / (window.innerHeight / 2);
     orbitCameraTeacher.aspect   = window.innerWidth / window.innerHeight;
-    orbitCameraUser.updateProjectionMatrix();
+    //orbitCameraUser.updateProjectionMatrix();
     orbitCameraTeacher.updateProjectionMatrix();
     //const orbitCameraUser = new THREE.PerspectiveCamera(35, init_width / init_height, 0.1, 1000);
     //const orbitCameraTeacher = new THREE.PerspectiveCamera(35, init_width_2 / init_height_2, 0.1, 1000);
