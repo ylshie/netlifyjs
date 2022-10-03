@@ -143,6 +143,12 @@ const teacherPath = "./assets/models/ソーマ.vrm";
 //addGrid(sceneUser)
 loadVRM(sceneUser, ashtraPath, (vrm) => {
     //vrm.scene.position.x = (detect)? -0.8: 0.5;
+    if (screen.width > screen.height) {
+        vrm.scene.position.x = -1;
+    } else {
+        vrm.scene.position.x = -0.5;
+    }
+    
     userVrm = vrm 
 })
 ///*
@@ -304,17 +310,23 @@ function findMindARVideo() {
 function adjustUserAvatar(rendererUser, orbitCameraUser) {
     var posLeft = 0;
     var posTop  = window.innerHeight / 2;
-    var targetWidth = window.innerWidth / 3;
+    var targetWidth = window.innerWidth;    //window.innerWidth / 3;
     var targetHeight = window.innerHeight / 2
 
     if ((layout == "ar") || (layout == "a")) {
         posTop = 0;
         targetHeight = window.innerHeight;
-        targetWidth = window.innerWidth / 2;
+        targetWidth = window.innerWidth;   //window.innerWidth / 2;
     }
     rendererUser.domElement.style.left  = posLeft
     rendererUser.domElement.style.top   = posTop;
     rendererUser.setSize(targetWidth, targetHeight);
+
+    if (screen.width > screen.height) {
+        userVrm.scene.position.x = -1;
+    } else {
+        userVrm.scene.position.x = -0.5;
+    }
 
     orbitCameraUser.aspect  = targetWidth / targetHeight;
     orbitCameraUser.updateProjectionMatrix();

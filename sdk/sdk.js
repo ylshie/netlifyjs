@@ -87,9 +87,9 @@ class araiSDK {
           }
         }
         
-        console.log(results);
-        console.log("to");
-        console.log(ret);
+        //console.log(results);
+        //console.log("to");
+        //console.log(ret);
 
         return ret;
     }
