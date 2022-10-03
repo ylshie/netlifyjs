@@ -23,6 +23,12 @@ if (opacity)
 else
     opacity = 0.8
 
+let _mirror = url.searchParams.get('mirror'); // => 'hello'
+var mirror = false;
+if (_mirror) 
+    mirror = (_mirror == "1")? true: false;
+else
+    mirror = false
     //import {GLTFLoader} from "./libs/GLTFLoader.js"
 
 //let x = xxx;
@@ -202,11 +208,12 @@ function playTeacherAnimator() {
 
     
     sdk.playResult(videoElement, teacherSkeleton, (results) => {
-        var rig = animateVRM(teacherVrm, results);
-        if (rig) {
-            //console.log("teacher")
-            //console.log(rig)
+        var  vrm_results = results;
+        if (mirror) {
+            vrm_results = sdk.mirrorResults(results)
         }
+
+        var rig = animateVRM(teacherVrm, vrm_results);
     }) 
 }
 sdk.onFirst = () => {
@@ -319,7 +326,9 @@ function setLayout(newValue) {
 function setOpacity(newValue) {
     opacity = newValue;
 }
-
+function setMirror(newValue) {
+    mirror = newValue;
+}
 function adjustPanel() {
     //let videoElement = document.querySelector("video");
     let videoElement = findMindARVideo();
@@ -346,6 +355,7 @@ function adjustPanel() {
 window.setLayout = setLayout;
 window.adjustPanel = adjustPanel;
 window.setOpacity = setOpacity;
+window.setMirror = setMirror;
 
 /* VRM Character Animator */
 const animateVRM = (vrm, results) => {

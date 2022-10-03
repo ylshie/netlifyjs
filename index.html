@@ -31,12 +31,12 @@
       html, body {position: relative; margin: 0; width: 100%; height: 100%; overflow: hidden}
       #teacher_video {
         position: absolute;
-        visibility: hidden;
+        visibility: hidden; /* KILLME */
         left: 0px;
         top: 0px;
         width: 640px;
         height: 360px;
-        z-index: -1;  /* -1; */
+        z-index: -1;  /* KILLME */
       }
       #left_panel {
         position: absolute;
@@ -95,23 +95,32 @@
       <img src="./setting.svg" width="32px" height="32px"/>
     </div>
     <div id="setPanel">
-      <span>
-        <form name="myForm">
+      <form name="myForm">
+        <div>
           <label>Layout</label>
-            <div class="switch-field">
-              <input type="radio" id="radio-three" name="layout_switch" value="ra" checked/>
-              <label for="radio-three">RA + A</label>
-              <input type="radio" id="radio-four" name="layout_switch" value="ar" />
-              <label for="radio-four">AR + A</label>
-              <input type="radio" id="radio-five" name="layout_switch" value="a" />
-              <label for="radio-five">A + A</label>
-            </div>
-        </form>
-      </span>
-      <span>
-        <label>Opacity</label>
-        <input id="user_opacity" type="range" min="1" max="100" value="80">
-      </span>
+          <span class="switch-field">
+            <input type="radio" id="radio-three" name="layout_switch" value="ra" checked/>
+            <label for="radio-three">RA + A</label>
+            <input type="radio" id="radio-four" name="layout_switch" value="ar" />
+            <label for="radio-four">AR + A</label>
+            <input type="radio" id="radio-five" name="layout_switch" value="a" />
+            <label for="radio-five">A + A</label>
+          </span>
+        </div>
+        <div>
+          <label>Opacity</label>
+          <input id="user_opacity" type="range" min="1" max="100" value="80">
+        </div>
+        <div>
+          <label>Mirror</label>
+          <span class="switch-field">
+            <input type="radio" id="radio-threeqq" name="mirror_switch" value="yes"/>
+            <label for="radio-threeqq">Yes</label>
+            <input type="radio" id="radio-fourqq" name="mirror_switch" value="no" checked/>
+            <label for="radio-fourqq">No</label>
+          </span>
+        </div>
+      </form>
     </div>
     <a class="abs logo" href="https://metawave.click" target="_blank">
       <div style="display: flex;align-items: center;bottom: 0;right: 10px;">
@@ -133,7 +142,8 @@
     var IsPanel = false;
 
     var rad = document.myForm.layout_switch;
-    var prev = null;
+    var prev    = null;
+    var prev_1  = null;
     for (var i = 0; i < rad.length; i++) {
         rad[i].addEventListener('change', function() {
             (prev) ? console.log(prev.value): null;
@@ -142,6 +152,18 @@
             }
             console.log("change to " + this.value)
             setLayout(this.value);
+            adjustPanel();
+        });
+    }
+    rad = document.myForm.mirror_switch;
+    for (var i = 0; i < rad.length; i++) {
+        rad[i].addEventListener('change', function() {
+            (prev_1) ? console.log(prev_1.value): null;
+            if (this !== prev_1) {
+                prev_1 = this;
+            }
+            console.log("change to " + this.value)
+            setMirror((this.value == "yes") ? true: false);
             adjustPanel();
         });
     }

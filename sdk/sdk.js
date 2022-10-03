@@ -7,10 +7,91 @@ import {loadModel, getSourceVideo} from "./sdk_ar.js"
 
 const modelPath = "./assets/models/musicband-raccoon/scene.gltf";
 
+const mirrorMap = [
+  0, //  0: Nose same
+  4, //  1: Left Eye Inner
+  5, //  2: Left Eye
+  6, //  3: Left Eye Outer
+  1, //  4: Right Eye Inner
+  2, //  5: Right Eye
+  3, //  6: Right Eye Outer
+  8, //  7: Left Ear
+  7, //  8: Right Ear
+ 10, //  9: Left Month
+  9, // 10: Right Month
+ 12, // 11: Left Shoulder
+ 11, // 12: Right Shoulder
+ 14, // 13: Left Elbow
+ 13, // 14: Right Elbow
+ 16, // 15: Left Wrist
+ 15, // 16: Right Wrist
+ 18, // 17: Left Pinky
+ 17, // 18: Right Pinky
+ 20, // 19: Left Index
+ 19, // 20: Right Index
+ 22, // 21: Left Thumb
+ 21, // 22: Right Thumb
+ 24, // 23: Left Hip
+ 23, // 24: Right Hip
+ 26, // 25: Left Knee
+ 25, // 26: Right Knee
+ 28, // 27: Left Ankle
+ 27, // 28: Right Ankle
+ 30, // 29: Left Heel
+ 29, // 30: Right Heel
+ 32, // 31: Left Foot Index
+ 31, // 32: Right Foot Index
+]
+
 var clock_3 = new THREE.Clock();
 class araiSDK {
     config = {
         usePos: true,
+    }
+    mirrorResults(results) {
+        var ret = {};
+        
+        if (results.poseLandmarks) {
+          ret.poseLandmarks       = new Array(results.poseLandmarks.length);
+        }
+        if (results.poseWorldLandmarks) {
+          ret.poseWorldLandmarks  = new Array(results.poseWorldLandmarks.length);
+        }
+        
+        ret.image = results.image;
+        if (results.poseLandmarks) {
+            if (! this.ref_x) {
+                this.ref_x = results.poseLandmarks[0].x;
+            }
+            //const ref_x = results.poseLandmarks[0].x;
+
+            for (let i=0; i < results.poseLandmarks.length; i++) {
+                const j = mirrorMap[i];
+
+                ret.poseLandmarks[i] = Object.assign({}, results.poseLandmarks[j])
+                ret.poseLandmarks[i].x = 2 * this.ref_x - ret.poseLandmarks[i].x;
+            }
+        }
+        
+        if (results.poseWorldLandmarks) {
+          //const ref_x = results.poseWorldLandmarks[0].x;
+          if (! this.ref_wx) {
+              this.ref_wx = results.poseWorldLandmarks[0].x;
+          }
+
+          for (let i=0; i < results.poseWorldLandmarks.length; i++) {
+              const j = mirrorMap[i];
+
+              ret.poseWorldLandmarks[i] = Object.assign({}, results.poseWorldLandmarks[j])
+              ret.poseWorldLandmarks[i].x = 2 * this.ref_wx - ret.poseWorldLandmarks[i].x;
+          }
+        }
+        
+        console.log(results);
+        console.log("to");
+        console.log(ret);
+
+        return ret;
     }
     loadVideoSkeleton(path, onLoaded = null) {
         var jsonFile = path; // "http://localhost:3000/dance.json";

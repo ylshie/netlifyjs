@@ -162,17 +162,18 @@ export function updateVRM (_currentVrm,videoElement, results) {
         old_pose3DLandmarks = pose3DLandmarks;
     }
     // Animate Pose
-    if (old_pose2DLandmarks && old_pose3DLandmarks) {
-        riggedPose = Kalidokit.Pose.solve(old_pose3DLandmarks, old_pose2DLandmarks, {
+    //if (old_pose2DLandmarks && old_pose3DLandmarks) {
+    if (pose2DLandmarks && pose3DLandmarks) {
+        //riggedPose = Kalidokit.Pose.solve(old_pose3DLandmarks, old_pose2DLandmarks, {
+        riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
             runtime: "mediapipe",
             video: videoElement,
         });
-        //console.log(old_pose3DLandmarks);
-        //console.log(old_pose2DLandmarks);
-        //console.log(riggedPose);
+        console.log(old_pose3DLandmarks);
+        console.log(old_pose2DLandmarks);
+        console.log(riggedPose);
 
         rigRotation(_currentVrm,"Hips", riggedPose.Hips.rotation, 0.7);
-        //rigPosition(_currentVrm,"Hips", riggedPose.Hips.position, 1, 0.07);
         ///*
         rigPosition(_currentVrm,
             "Hips",
