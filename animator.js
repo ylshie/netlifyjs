@@ -192,7 +192,7 @@ function playTeacherAnimator() {
     sdk.playResult(videoElement, teacherSkeleton, (results) => {
         var rig = animateVRM(teacherVrm, results);
         if (rig) {
-            console.log("teacher")
+            //console.log("teacher")
             //console.log(rig)
         }
     }) 

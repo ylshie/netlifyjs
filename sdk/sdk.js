@@ -86,7 +86,7 @@ class araiSDK {
           //console.log("key: " + key);
           if (key < current) continue;
 
-          console.log("current: " + current + " pick " + key)
+          // console.log("current: " + current + " pick " + key)
           var record = curJson[key];
           var result = {};
           if (record.poseLandmarks) {
@@ -124,7 +124,7 @@ class araiSDK {
     
         this.onResults = (results) => {
           var delta = clock_3.getDelta();
-          console.log("clock 3 FPS=" + 1 / delta);
+          //console.log("clock 3 FPS=" + 1 / delta);
 
         //  return; // KILLME
         // console.log("onResult")
