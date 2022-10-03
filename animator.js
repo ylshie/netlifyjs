@@ -322,12 +322,14 @@ function adjustUserAvatar(rendererUser, orbitCameraUser) {
     rendererUser.domElement.style.top   = posTop;
     rendererUser.setSize(targetWidth, targetHeight);
 
-    if (screen.width > screen.height) {
-        userVrm.scene.position.x = -1;
-    } else {
-        userVrm.scene.position.x = -0.5;
+    if(userVrm) {
+        if (screen.width > screen.height) {
+            userVrm.scene.position.x = -1;
+        } else {
+            userVrm.scene.position.x = -0.5;
+        }
     }
-
+    
     orbitCameraUser.aspect  = targetWidth / targetHeight;
     orbitCameraUser.updateProjectionMatrix();
 }
