@@ -246,6 +246,8 @@ function adjustUserVideo(elm) {
     }
     if (layout == "a") {
         elm.style.visibility = "hidden";
+    } else {
+        if (elm != video) elm.style.visibility = "visible";
     }
 
     elm.style.position  = 'absolute';
@@ -311,21 +313,24 @@ function adjustUserAvatar(rendererUser, orbitCameraUser) {
     orbitCameraUser.updateProjectionMatrix();
 }
 
+function setLayout(newValue) {
+    layout = newValue;
+}
+function setOpacity(newValue) {
+    opacity = newValue;
+}
+
 function adjustPanel() {
     //let videoElement = document.querySelector("video");
     let videoElement = findMindARVideo();
     let videoCanvas = document.querySelector(".output_canvas");
 
-    //adjustPos(videoElement, 0); //window.innerWidth / 3 + 200);
-    //adjustPos(videoCanvas,  0); //window.innerWidth / 3);
     videoElement.style.visibility = "hidden"
     videoCanvas.style.opacity = parseFloat(opacity);
     adjustUserVideo(videoElement);
     adjustUserVideo(videoCanvas);
     
     adjustUserAvatar(rendererUser, orbitCameraUser)
-    //rendererUser.domElement.style.left = 0 //window.innerWidth / 3;
-    //rendererUser.domElement.style.top = window.innerHeight / 2;
     rendererTeacher.domElement.style.left = 0;
     rendererTeacher.domElement.style.top = 0;
     
@@ -336,17 +341,12 @@ function adjustPanel() {
     orbitCameraTeacher.aspect   = window.innerWidth / window.innerHeight;
     //orbitCameraUser.updateProjectionMatrix();
     orbitCameraTeacher.updateProjectionMatrix();
-    //const orbitCameraUser = new THREE.PerspectiveCamera(35, init_width / init_height, 0.1, 1000);
-    //const orbitCameraTeacher = new THREE.PerspectiveCamera(35, init_width_2 / init_height_2, 0.1, 1000);
-
-    /*
-    if (   ((3 * rendererUser.domElement.style.width / 2) != window.innerWidth)
-        || (rendererUser.domElement.style.height != window.innerHeight)) 
-    {
-        rendererUser.setSize(window.innerWidth * 2 / 3, window.innerHeight);
-    }
-    */
 }
+
+window.setLayout = setLayout;
+window.adjustPanel = adjustPanel;
+window.setOpacity = setOpacity;
+
 /* VRM Character Animator */
 const animateVRM = (vrm, results) => {
     if (null == vrm) return null;

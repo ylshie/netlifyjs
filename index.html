@@ -69,12 +69,12 @@
         position: absolute;
         left: 0px;
         top: 0px;
-        z-index: 8;
+        z-index: 2;
       }
       #toggle {
         position: absolute;
-        left: 0px;
-        top: 0px;
+        left: 0%;
+        top: 0%;
         width: 100%;
         height: 100%;
         z-index: 3;
@@ -91,6 +91,28 @@
     <!--<video id="input_video"></video> --KILL ME-->
     <!--<div id="left_panel"></div>-->
     <div id="right_panel"></div>
+    <div id="logobutton">
+      <img src="./setting.svg" width="32px" height="32px"/>
+    </div>
+    <div id="setPanel">
+      <span>
+        <form name="myForm">
+          <label>Layout</label>
+            <div class="switch-field">
+              <input type="radio" id="radio-three" name="layout_switch" value="ra" checked/>
+              <label for="radio-three">RA + A</label>
+              <input type="radio" id="radio-four" name="layout_switch" value="ar" />
+              <label for="radio-four">AR + A</label>
+              <input type="radio" id="radio-five" name="layout_switch" value="a" />
+              <label for="radio-five">A + A</label>
+            </div>
+        </form>
+      </span>
+      <span>
+        <label>Opacity</label>
+        <input id="user_opacity" type="range" min="1" max="100" value="80">
+      </span>
+    </div>
     <a class="abs logo" href="https://metawave.click" target="_blank">
       <div style="display: flex;align-items: center;bottom: 0;right: 10px;">
         <img class="logo" src="logo.png" alt="" style="height: 50px;">
@@ -104,9 +126,45 @@
   <!--<script src="./araisdk.prod.js" type="module"></script>-->
   <script>
     var element = document.body;
+    var toggle  = document.querySelector("#toggle");
+    var ui          = document.querySelector("#logobutton");
+    var elmOpacity  = document.querySelector("#user_opacity");
     var IsFullscreen = false;
+    var IsPanel = false;
 
-    element.onclick = () => {
+    var rad = document.myForm.layout_switch;
+    var prev = null;
+    for (var i = 0; i < rad.length; i++) {
+        rad[i].addEventListener('change', function() {
+            (prev) ? console.log(prev.value): null;
+            if (this !== prev) {
+                prev = this;
+            }
+            console.log("change to " + this.value)
+            setLayout(this.value);
+            adjustPanel();
+        });
+    }
+    elmOpacity.onchange = (event) => {
+        console.log("opacity=" + this.value + " " + elmOpacity.value)
+        setOpacity(elmOpacity.value / 100);
+        adjustPanel();
+    }
+    ui.onclick = () => {
+        var panel= document.querySelector("#setPanel");
+        
+        panel.style.visibility = "visible";
+        IsPanel = true;
+    }
+    toggle.onclick = () => {
+        if (IsPanel) {
+            var panel= document.querySelector("#setPanel");
+        
+            panel.style.visibility = "hidden";
+            IsPanel = false;
+
+            return;
+        }
         if (IsFullscreen) {
             if (document.exitFullscreen) {
                 document.exitFullscreen()
