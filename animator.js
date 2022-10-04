@@ -186,13 +186,13 @@ if (detect == null) {
 
 function playTeacherVideo() {
     if (! played) {
-        played = true;
         var videoElement = document.querySelector("#teacher_video");
-
         if (null == videoElement) {
             console.log("no teacher video found")
-            return;
+            return; // Need to wait
         }
+        //played = true;
+
         var playok = false;
         try {
             videoElement.play()
@@ -204,6 +204,8 @@ function playTeacherVideo() {
             videoElement.muted = true;
             videoElement.play()
         }
+
+        played = true;
     }
 }
 
