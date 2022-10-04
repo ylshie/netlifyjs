@@ -187,12 +187,11 @@ if (detect == null) {
 function playTeacherVideo() {
     if (! played) {
         var videoElement = document.querySelector("#teacher_video");
+
         if (null == videoElement) {
             console.log("no teacher video found")
-            return; // Need to wait
+            return;
         }
-        //played = true;
-
         var playok = false;
         try {
             videoElement.play()
@@ -203,8 +202,8 @@ function playTeacherVideo() {
         if (! playok) { // Safari
             videoElement.muted = true;
             videoElement.play()
+            console.log("play teacher video")
         }
-
         played = true;
     }
 }
@@ -229,6 +228,7 @@ sdk.onFirst = () => {
 }
 sdk.onCallback = (results) => {
     //return; // KILLME
+    console.log("enter callack");
     adjustPanel();
 
     playTeacherVideo();
@@ -241,6 +241,7 @@ sdk.onCallback = (results) => {
     playTeacherAnimator()
     rendererUser.render(sceneUser, orbitCameraUser);
     rendererTeacher.render(sceneTeacher, orbitCameraTeacher);
+    console.log("leave callack");
 }
 function adjustUserVideo(elm) {
     let video = findMindARVideo();
@@ -324,7 +325,7 @@ function adjustUserAvatar(rendererUser, orbitCameraUser) {
     rendererUser.domElement.style.top   = posTop;
     rendererUser.setSize(targetWidth, targetHeight);
 
-    if(userVrm) {
+    if (userVrm) {
         if (screen.width > screen.height) {
             userVrm.scene.position.x = -1;
         } else {
@@ -350,7 +351,8 @@ function adjustPanel() {
     let videoElement = findMindARVideo();
     let videoCanvas = document.querySelector(".output_canvas");
 
-    videoElement.style.visibility = "hidden"
+    //videoElement.style.visibility = "hidden"
+    videoElement.style.zIndex = -3
     videoCanvas.style.opacity = parseFloat(opacity);
     adjustUserVideo(videoElement);
     adjustUserVideo(videoCanvas);

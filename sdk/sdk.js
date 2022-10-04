@@ -127,6 +127,7 @@ class araiSDK {
                   self.onFirst();
                 }
               }
+              console.log("on frame")
               //var delta = clock_3.getDelta();
               //console.log("clock 3 FPS=" + 1 / delta);
               //return; // KILLME: Hack for skip detection;
@@ -208,7 +209,7 @@ class araiSDK {
           //console.log("clock 3 FPS=" + 1 / delta);
 
         //  return; // KILLME
-        // console.log("onResult")
+           console.log("onResult")
         // Draw landmark guides
             if (this.mode == "detect") {
               this.drawResults(results);
@@ -220,7 +221,7 @@ class araiSDK {
             if (this.onCallback) {
               this.onCallback(results, results);
             }
-        };
+         };
 
         const data_file_map = {
             assets_loader_js: "assets_loader.js", // holistic_solution_packed_assets_loader.js
@@ -237,6 +238,7 @@ class araiSDK {
         if (this.config.usePos) {
             this.pose = new Pose({
               locateFile: (file) => {
+                console.log("load file " + file);
                 return `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.4/${file}`;
               }
             });
@@ -306,7 +308,7 @@ class araiSDK {
       }
 
       detectVideo(results) {
-        let videoElement = document.querySelector("video");
+        //let videoElement = document.querySelector("video");
         var srcVideo = this.sourceVideo();
         if (srcVideo == null) return;
 
@@ -380,7 +382,7 @@ class araiSDK {
         }
       }
       drawResults (results) {
-        let videoElement = document.querySelector("video");
+        //let videoElement = document.querySelector("video");
         
         this.detectVideo(results);
         this.drawSkeleton(results);
