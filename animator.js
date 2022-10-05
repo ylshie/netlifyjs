@@ -174,25 +174,35 @@ if (! detect) {
 */
 
 async function addTeacherVideo(scene) {
-    const video = await loadVideo("./assets/mock-videos/avatar.mp4");
-    video.play();
+    //const video = await loadVideo("./assets/mock-videos/avatar.mp4");
+    const video = document.createElement("video");
+    video.crossOrigin = "anonymous";
+    //video.id = "teacher_video";
+    video.src = "./assets/mock-videos/avatar.mp4"
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+
+    //video.play();
     video.pause();
     const texture = new THREE.VideoTexture(video);
 
-    const geometry = new THREE.PlaneGeometry(1, 1080/1920);
+    const geometry = new THREE.PlaneGeometry(1, 1920/1080);
     //const material = new THREE.MeshBasicMaterial({map: texture});
     const material = createChromaMaterial(texture, 0x00ff00);
     const plane = new THREE.Mesh(geometry, material);
     //plane.rotation.x = Math.PI/2;
-    //plane.position.y = 0.7;
+    plane.position.y = 0.7;
     plane.scale.multiplyScalar(4)
     
 
     scene.add(plane);
-    video.loop = true;
+    
     video.play();
 }
-addTeacherVideo(sceneTeacher);
+setTimeout(() => {
+    addTeacherVideo(sceneTeacher);
+}, 1000);
 
 var played = false;
 var sdk = new araiSDK();
