@@ -187,13 +187,14 @@ async function addTeacherVideo(scene) {
     video.pause();
     const texture = new THREE.VideoTexture(video);
 
-    const geometry = new THREE.PlaneGeometry(1, 1920/1080);
+    const geometry = new THREE.PlaneGeometry(1, 1616/1080);
     //const material = new THREE.MeshBasicMaterial({map: texture});
     const material = createChromaMaterial(texture, 0x00ff00);
     const plane = new THREE.Mesh(geometry, material);
     //plane.rotation.x = Math.PI/2;
-    plane.position.y = 0.7;
-    plane.scale.multiplyScalar(4)
+    plane.position.x = 0.6;
+    plane.position.y = 1.1;
+    plane.scale.multiplyScalar(2)
     
 
     scene.add(plane);
