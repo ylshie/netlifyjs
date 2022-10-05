@@ -268,7 +268,7 @@ sdk.onCallback = (results) => {
 
     playTeacherVideo();
     
-    vrm_results = sdk.mirrorResults(results)
+    var vrm_results = sdk.mirrorResults(results)
     if (detect) {
         animateVRM(teacherVrm, vrm_results);
     } else {
