@@ -122,6 +122,7 @@
           <input id="user_opacity" type="range" min="1" max="100" value="80"/>
         </div>
         <div>
+          <!--
           <label>Mirror</label>
           <span class="switch-field">
             <input type="radio" id="radio-threeqq" name="mirror_switch" value="yes"/>
@@ -129,6 +130,7 @@
             <input type="radio" id="radio-fourqq" name="mirror_switch" value="no" checked/>
             <label for="radio-fourqq">No</label>
           </span>
+          -->
         </div>
       </form>
     </div>
@@ -190,7 +192,8 @@
         });
     }
     rad = document.myForm.mirror_switch;
-    for (var i = 0; i < rad.length; i++) {
+    if (rad) {
+      for (var i = 0; i < rad.length; i++) {
         rad[i].addEventListener('change', function() {
             (prev_1) ? console.log(prev_1.value): null;
             if (this !== prev_1) {
@@ -200,6 +203,7 @@
             setMirror((this.value == "yes") ? true: false);
             adjustPanel();
         });
+      }
     }
     elmOpacity.onchange = (event) => {
         console.log("opacity=" + this.value + " " + elmOpacity.value)

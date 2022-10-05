@@ -268,10 +268,11 @@ sdk.onCallback = (results) => {
 
     playTeacherVideo();
     
+    vrm_results = sdk.mirrorResults(results)
     if (detect) {
-        animateVRM(teacherVrm, results);
+        animateVRM(teacherVrm, vrm_results);
     } else {
-        animateVRM(userVrm, results);
+        animateVRM(userVrm, vrm_results);
     }
     //playTeacherAnimator()
     rendererUser.render(sceneUser, orbitCameraUser);
