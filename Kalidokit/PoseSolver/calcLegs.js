@@ -12,15 +12,23 @@ export const offsets = {
  * Calculates leg rotation angles
  * @param {Results} lm : array of 3D pose vectors from tfjs or mediapipe
  */
+/*
+ 24, // 23: Left Hip
+ 23, // 24: Right Hip
+ 26, // 25: Left Knee
+ 25, // 26: Right Knee
+ 28, // 27: Left Ankle
+ 27, // 28: Right Ankle
+*/
 export const calcLegs = (lm) => {
-    const rightUpperLegSphericalCoords = Vector.getSphericalCoords(lm[23], lm[25], { x: "y", y: "z", z: "x" });
-    const leftUpperLegSphericalCoords = Vector.getSphericalCoords(lm[24], lm[26], { x: "y", y: "z", z: "x" });
-    const rightLowerLegSphericalCoords = Vector.getRelativeSphericalCoords(lm[23], lm[25], lm[27], {
+    const rightUpperLegSphericalCoords  = Vector.getSphericalCoords(lm[23], lm[25], { x: "y", y: "z", z: "x" }); //Left Hip Knee
+    const leftUpperLegSphericalCoords   = Vector.getSphericalCoords(lm[24], lm[26], { x: "y", y: "z", z: "x" }); //Right Hip Knee
+    const rightLowerLegSphericalCoords  = Vector.getRelativeSphericalCoords(lm[23], lm[25], lm[27], {  //Left Hip Knee Ankle
         x: "y",
         y: "z",
         z: "x",
     });
-    const leftLowerLegSphericalCoords = Vector.getRelativeSphericalCoords(lm[24], lm[26], lm[28], {
+    const leftLowerLegSphericalCoords   = Vector.getRelativeSphericalCoords(lm[24], lm[26], lm[28], { //Right Hip Knee Ankle
         x: "y",
         y: "z",
         z: "x",
@@ -51,8 +59,8 @@ export const calcLegs = (lm) => {
         }),
     };
     //Modify Rotations slightly for more natural movement
-    const rightLegRig = rigLeg(UpperLeg.r, LowerLeg.r, RIGHT);
-    const leftLegRig = rigLeg(UpperLeg.l, LowerLeg.l, LEFT);
+    const rightLegRig   = rigLeg(UpperLeg.r, LowerLeg.r, RIGHT);
+    const leftLegRig    = rigLeg(UpperLeg.l, LowerLeg.l, LEFT);
     return {
         //Scaled
         UpperLeg: {

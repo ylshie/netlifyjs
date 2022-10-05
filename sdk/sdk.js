@@ -127,7 +127,7 @@ class araiSDK {
                   self.onFirst();
                 }
               }
-              console.log("on frame")
+              //console.log("on frame")
               //var delta = clock_3.getDelta();
               //console.log("clock 3 FPS=" + 1 / delta);
               //return; // KILLME: Hack for skip detection;
@@ -209,7 +209,7 @@ class araiSDK {
           //console.log("clock 3 FPS=" + 1 / delta);
 
         //  return; // KILLME
-           console.log("onResult")
+        //   console.log("onResult")
         // Draw landmark guides
             if (this.mode == "detect") {
               this.drawResults(results);
@@ -378,7 +378,7 @@ class araiSDK {
         }
         if (this.mode == "detect") {
           this.tmpFile[record.current] = record;
-          console.log(record.current + " / " +  this.sourceVideo().duration);
+          //console.log(record.current + " / " +  this.sourceVideo().duration);
         }
       }
       drawResults (results) {

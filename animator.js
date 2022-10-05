@@ -3,6 +3,8 @@ import * as xxx from "./sdk/build/araisdk.prod"
 //import * as xxx from "./sdk/build/araisdk.dm"
 //import {currentVrm, updateVRM, loadVRM, setVRM}from "./vrmlib"
 import {updateVRM, loadVRM}from "./vrmlib"
+import {loadVideo} from './sdk/libs/camera-mock.js';
+import {createChromaMaterial} from './sdk/libs/chroma-video.js';
 
 const url = new URL(window.location);
 let detect = url.searchParams.get('video'); // => 'hello'
@@ -30,6 +32,8 @@ if (_mirror)
 else
     mirror = false
     //import {GLTFLoader} from "./libs/GLTFLoader.js"
+
+var DumpMode = false;
 
 //let x = xxx;
 /* THREEJS WORLD SETUP */
@@ -67,6 +71,7 @@ orbitCameraUser.position.set(0.0, 1.0, 4.0);
 //orbitCamera.position.set(0.0, 1.4, 0.7);
 
 const orbitCameraTeacher = new THREE.PerspectiveCamera(35, init_width_2 / init_height_2, 0.1, 1000);
+//const orbitCameraTeacher = new THREE.PerspectiveCamera(35, 1, 0.1, 1000);
 orbitCameraTeacher.position.set(0.0, 1.0, 4.0);
 
 // controls
@@ -151,13 +156,13 @@ loadVRM(sceneUser, ashtraPath, (vrm) => {
     
     userVrm = vrm 
 })
-///*
+/*
 loadVRM(sceneTeacher, teacherPath, (vrm) => {
     vrm.scene.position.x = 0.5;
     teacherVrm = vrm;
     animate();
 })
-//*/
+*/
 /*
 if (! detect) {
     loadVRM(sceneUser, teacherPath, (vrm) => {
@@ -167,6 +172,27 @@ if (! detect) {
     })
 }
 */
+
+async function addTeacherVideo(scene) {
+    const video = await loadVideo("./assets/mock-videos/avatar.mp4");
+    video.play();
+    video.pause();
+    const texture = new THREE.VideoTexture(video);
+
+    const geometry = new THREE.PlaneGeometry(1, 1080/1920);
+    //const material = new THREE.MeshBasicMaterial({map: texture});
+    const material = createChromaMaterial(texture, 0x00ff00);
+    const plane = new THREE.Mesh(geometry, material);
+    //plane.rotation.x = Math.PI/2;
+    //plane.position.y = 0.7;
+    plane.scale.multiplyScalar(4)
+    
+
+    scene.add(plane);
+    video.loop = true;
+    video.play();
+}
+addTeacherVideo(sceneTeacher);
 
 var played = false;
 var sdk = new araiSDK();
@@ -189,7 +215,7 @@ function playTeacherVideo() {
         var videoElement = document.querySelector("#teacher_video");
 
         if (null == videoElement) {
-            console.log("no teacher video found")
+            //console.log("no teacher video found")
             return;
         }
         var playok = false;
@@ -223,12 +249,10 @@ function playTeacherAnimator() {
         var rig = animateVRM(teacherVrm, vrm_results);
     }) 
 }
-sdk.onFirst = () => {
-    //playTeacherVideo();
-}
+
 sdk.onCallback = (results) => {
     //return; // KILLME
-    console.log("enter callack");
+    //console.log("enter callack");
     adjustPanel();
 
     playTeacherVideo();
@@ -238,10 +262,9 @@ sdk.onCallback = (results) => {
     } else {
         animateVRM(userVrm, results);
     }
-    playTeacherAnimator()
+    //playTeacherAnimator()
     rendererUser.render(sceneUser, orbitCameraUser);
     rendererTeacher.render(sceneTeacher, orbitCameraTeacher);
-    console.log("leave callack");
 }
 function adjustUserVideo(elm) {
     let video = findMindARVideo();
@@ -348,14 +371,16 @@ function setMirror(newValue) {
 }
 function adjustPanel() {
     //let videoElement = document.querySelector("video");
-    let videoElement = findMindARVideo();
-    let videoCanvas = document.querySelector(".output_canvas");
+    let videoElement    = findMindARVideo();
+    let videoCanvas     = document.querySelector(".output_canvas");
+    let videoControls   = document.querySelector("#video_controls")
 
     //videoElement.style.visibility = "hidden"
     videoElement.style.zIndex = -3
     videoCanvas.style.opacity = parseFloat(opacity);
     adjustUserVideo(videoElement);
     adjustUserVideo(videoCanvas);
+    //adjustUserVideo(videoControls);
     
     adjustUserAvatar(rendererUser, orbitCameraUser)
     rendererTeacher.domElement.style.left = 0;
@@ -374,6 +399,77 @@ window.setLayout = setLayout;
 window.adjustPanel = adjustPanel;
 window.setOpacity = setOpacity;
 window.setMirror = setMirror;
+window.bindVideoControl = bindVideoControl;
+
+function bindVideoControl(type, elm) {
+    var video = sdk.sourceVideo();
+
+    if (type == "play") {
+        console.log("bind play " + elm)
+        elm.onclick = () => {
+            if (video.paused) {
+                var speed = elmSpeed.value;
+                video.playbackRate = speed;
+                video.play();
+                elm.innerText = "Pause"
+            } else {
+                video.pause();
+                elm.innerText = "Play"
+            }
+        }
+    } else if (type == "time") {
+            var timeLoop = () => {
+                setTimeout(() => {
+                    elm.value       = video.currentTime;
+                    elmRange.value  = video.currentTime * 10;
+                    timeLoop();
+                }, 300);
+            }
+            timeLoop();
+    } else if (type == "range") {
+            elm.min = 0;
+            elm.max = video.duration * 10;
+            elm.oninput = () => {
+                video.currentTime = parseInt(elm.value) / 10.0;
+            }
+    } else if (type == "back") {
+            elm.onclick = () => {
+                video.currentTime = (parseInt(elmRange.value) - 1) / 10.0;
+            }
+    } else if (type == "next") {
+            elm.onclick = () => {
+                video.currentTime = (parseInt(elmRange.value) + 1) / 10.0;
+            }
+    } else if (type == "dump") {
+            elm.onclick = () => {
+                DumpMode = !DumpMode;
+                if (DumpMode) {
+                    elm.innerText = "O"
+                } else {
+                    elm.innerText = "V"
+                }
+            }
+    }
+}
+
+var elmPlay  = document.querySelector("#btnPlay");
+var elmTime  = document.querySelector("#btnTime");
+var elmRange = document.querySelector("#btnRange");
+var elmSpeed = document.querySelector("#btnSpeed");
+var elmBack  = document.querySelector("#btnBack");
+var elmNext  = document.querySelector("#btnNext");
+var elmDump  = document.querySelector("#btnDump");
+
+sdk.onFirst = () => {
+    return;
+    bindVideoControl("play",  elmPlay)
+    bindVideoControl("time",  elmTime)
+    bindVideoControl("range", elmRange)
+    bindVideoControl("back",  elmBack)
+    bindVideoControl("next",  elmNext)
+    bindVideoControl("dump",  elmDump)
+}
+
 
 /* VRM Character Animator */
 const animateVRM = (vrm, results) => {
@@ -382,7 +478,7 @@ const animateVRM = (vrm, results) => {
     //let videoElement = document.querySelector("video");
     let videoElement = findMindARVideo();
 
-    var rigPos = updateVRM(vrm, videoElement, results);
+    var rigPos = updateVRM(vrm, videoElement, results, DumpMode);
     // Update model to render physics
     var delta = clock_1.getDelta();
     //console.log("clock 1=" + delta);

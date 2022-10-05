@@ -126,7 +126,7 @@ var old_leftHandLandmarks = null;
 var old_rightHandLandmarks = null;
 //*/
 
-export function updateVRM (_currentVrm,videoElement, results) {
+export function updateVRM (_currentVrm,videoElement, results, dump = false) {
     // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
     let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
 
@@ -169,10 +169,12 @@ export function updateVRM (_currentVrm,videoElement, results) {
             runtime: "mediapipe",
             video: videoElement,
         });
-        console.log(old_pose3DLandmarks);
-        console.log(old_pose2DLandmarks);
-        console.log(riggedPose);
-
+        if (dump) {
+            console.log(pose3DLandmarks);
+            console.log(pose2DLandmarks);
+            console.log(riggedPose);
+        }
+        
         rigRotation(_currentVrm,"Hips", riggedPose.Hips.rotation, 0.7);
         ///*
         rigPosition(_currentVrm,

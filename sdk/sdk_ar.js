@@ -8,7 +8,6 @@ import {mockWithVideo} from './libs/camera-mock.js';
 import MindARThree from "./libs/mindar/mindar-image-three.prod.js"
 
 //
-
 const configVideo = {
   renderAlpha: false,
   renderVideo: false,
@@ -57,6 +56,15 @@ export function getSourceDuration() {
   return sourceDuration;
 }
 
+function IsSafari() {
+  // Safari 3.0+ "[object HTMLElementConstructor]" 
+  var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
+
+  console.log("IsSafari=" + (isSafari ? "yes": "no") + " user agent=" + navigator.userAgent)
+
+  return isSafari;
+}
+
 export function startMindAR(video_file) {
   //  
     const {renderer, scene, camera} = mindarThree;
@@ -83,15 +91,7 @@ export function startMindAR(video_file) {
   else
       console.log("from webcam");
 
-  function IsSafari() {
-    // Safari 3.0+ "[object HTMLElementConstructor]" 
-    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
-
-    console.log("IsSafari=" + (isSafari ? "yes": "no") + " user agent=" + navigator.userAgent)
-
-    return isSafari;
-  }
-
+  
   const start = async() => {
       if (videofile) {
           //mockWithVideo("./assets/mock-videos/face1.mp4")
@@ -136,7 +136,7 @@ export function startMindAR(video_file) {
         //video.height = "320px"
         document.body.appendChild(video);
         doLoad();
-        //video.play() // KILLME: Arthur, should remove
+        video.play() // KILLME: Arthur, should remove
       
         setTimeout(function() {
           //console.log("FUCK Start")
@@ -163,12 +163,31 @@ var ctx2;
 var video_width;
 var video_height;
 
+var clock_v = null; //new THREE.Clock();
 function timerCallback() {
   if (playvideo.paused || playvideo.ended) {
     return;
   }
   //return; // KILLME: Skip to drawing
   if (configVideo.renderVideo) {
+    if (video_width == 0 || video_height == 0) {
+      video_width   = playvideo.videoWidth;
+      video_height  = playvideo.videoHeight;
+  
+      console.log("video size is " + video_width + " x " + video_height)
+  
+      c1.width  = video_width;
+      c2.width  = video_width;
+      c1.height = video_height;
+      c2.height = video_height;
+    }
+
+    if (clock_v == null) {
+        clock_v = new THREE.Clock();
+    } else {
+        var delta = clock_v.getDelta();
+        console.log("video FPS=" + 1 / delta);
+    }
     computeFrame();
   }
   //let self = this;
@@ -225,7 +244,7 @@ function findChromaKey(data) {
       return b.num - a.num;
   });
 
-  const dt = 90;
+  const dt = 110;
   var top = sortable[0];
   if (top.r == 0 && top.g == 0 && top.b == 0)
     top = sortable[1];
@@ -261,7 +280,7 @@ function findChromaKey(data) {
     min_r: min_r, min_g: min_g, min_b: min_b}
   
   console.log(top);
-  console.log(chroma_range)
+  console.log(sortable)
 
   return chroma_range;
 }
@@ -296,7 +315,7 @@ function computeFrame() {
 function startTimer() {
   setTimeout(function () {
       if (raccoon) {
-          startMindAR("dance.mp4"); //"dance.mp4"  // "pressmaster.mp4"
+          startMindAR("avatar.mp4"); //"dance.mp4"  // "pressmaster.mp4"
       } else {
           setTimeout(startTimer, 100)
       }

@@ -4,6 +4,7 @@ export const mockWithVideo = (path) => {
   const video = document.createElement("video");
 
   video.crossOrigin = "anonymous";
+  //video.playbackRate = 0.5;
   retVideo = video;
 
   navigator.mediaDevices.getUserMedia = () => {
@@ -31,6 +32,7 @@ export const mockWithVideo = (path) => {
           };
           video.setAttribute('loop', '');
           //video.autoplay = true;
+          video.controls = true;
           video.setAttribute("src", path);
       });
   };
@@ -56,3 +58,17 @@ export const mockWithImage = (path) => {
       });
     };
   }
+
+  export const loadVideo = (path) => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement("video");
+      //video.addEventListener('loadeddata', () => {
+      video.addEventListener('loadedmetadata', () => {
+        video.setAttribute('playsinline', '');
+        resolve(video);
+      });
+      video.src = path;
+    });
+  }
+
+  
