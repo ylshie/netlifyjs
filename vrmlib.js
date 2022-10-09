@@ -126,6 +126,26 @@ var old_leftHandLandmarks = null;
 var old_rightHandLandmarks = null;
 //*/
 
+function cvAngle(props) {
+    if (null == props) return props;
+
+    var ret = {}
+    Object.keys(props).forEach(key => {
+        var obj = props[key];
+        var newvalue = {};
+        Object.keys(obj).forEach(objkey => {
+            var objval = obj[objkey];
+            newvalue[objkey] = objval * 180 / Math.PI;
+        });
+        ret[key] = newvalue
+        //var check = props[key];
+        //var value = parseFloat(check);
+        //var convert = value * 180 / Math.PI
+        //ret[key] =  convert;
+        //console.log(key, obj[key]);
+    }); 
+    return ret;
+}
 export function updateVRM (_currentVrm,videoElement, results, dump = false) {
     // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
     let riggedPose, riggedLeftHand, riggedRightHand, riggedFace;
@@ -168,11 +188,13 @@ export function updateVRM (_currentVrm,videoElement, results, dump = false) {
         riggedPose = Kalidokit.Pose.solve(pose3DLandmarks, pose2DLandmarks, {
             runtime: "mediapipe",
             video: videoElement,
+            debug: dump
         });
         if (dump) {
-            console.log(pose3DLandmarks);
-            console.log(pose2DLandmarks);
-            console.log(riggedPose);
+            riggedPose.Debug.leg_calc = cvAngle(riggedPose.Debug.leg_calc)
+            console.log(riggedPose.Hips);
+            console.log(riggedPose.Spine);
+            console.log(riggedPose.Debug);
         }
         
         rigRotation(_currentVrm,"Hips", riggedPose.Hips.rotation, 0.7);
@@ -196,8 +218,8 @@ export function updateVRM (_currentVrm,videoElement, results, dump = false) {
         rigRotation(_currentVrm,"LeftUpperArm", riggedPose.LeftUpperArm, 1, 0.3);
         rigRotation(_currentVrm,"LeftLowerArm", riggedPose.LeftLowerArm, 1, 0.3);
 
-        rigRotation(_currentVrm,"LeftUpperLeg", riggedPose.LeftUpperLeg, 1, 0.3);
-        rigRotation(_currentVrm,"LeftLowerLeg", riggedPose.LeftLowerLeg, 1, 0.3);
+        rigRotation(_currentVrm,"LeftUpperLeg",  riggedPose.LeftUpperLeg,  1, 0.3);
+        rigRotation(_currentVrm,"LeftLowerLeg",  riggedPose.LeftLowerLeg,  1, 0.3);
         rigRotation(_currentVrm,"RightUpperLeg", riggedPose.RightUpperLeg, 1, 0.3);
         rigRotation(_currentVrm,"RightLowerLeg", riggedPose.RightLowerLeg, 1, 0.3);
     }

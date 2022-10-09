@@ -3,7 +3,7 @@ import * as xxx from "./sdk/build/araisdk.prod"
 //import * as xxx from "./sdk/build/araisdk.dm"
 //import {currentVrm, updateVRM, loadVRM, setVRM}from "./vrmlib"
 import {updateVRM, loadVRM}from "./vrmlib"
-import {loadVideo} from './sdk/libs/camera-mock.js';
+//import {loadVideo} from './sdk/libs/camera-mock.js';
 import {createChromaMaterial} from './sdk/libs/chroma-video.js';
 
 const url = new URL(window.location);
@@ -34,6 +34,9 @@ else
     //import {GLTFLoader} from "./libs/GLTFLoader.js"
 
 var DumpMode = false;
+var config = {
+    showTeacherVideo: false,
+}
 
 //let x = xxx;
 /* THREEJS WORLD SETUP */
@@ -156,13 +159,13 @@ loadVRM(sceneUser, ashtraPath, (vrm) => {
     
     userVrm = vrm 
 })
-/*
+///*
 loadVRM(sceneTeacher, teacherPath, (vrm) => {
     vrm.scene.position.x = 0.5;
     teacherVrm = vrm;
     animate();
 })
-*/
+//*/
 /*
 if (! detect) {
     loadVRM(sceneUser, teacherPath, (vrm) => {
@@ -173,6 +176,7 @@ if (! detect) {
 }
 */
 
+var teacherVideo = null;
 async function addTeacherVideo(scene) {
     //const video = await loadVideo("./assets/mock-videos/avatar.mp4");
     const video = document.createElement("video");
@@ -194,16 +198,20 @@ async function addTeacherVideo(scene) {
     //plane.rotation.x = Math.PI/2;
     plane.position.x = 0.6;
     plane.position.y = 1.1;
-    plane.scale.multiplyScalar(2)
+    plane.scale.multiplyScalar(1)
     
 
-    scene.add(plane);
+    if (config.showTeacherVideo) {
+        scene.add(plane);
+    }
     
     video.play();
+    teacherVideo = video;
 }
-setTimeout(() => {
-    addTeacherVideo(sceneTeacher);
-}, 1000);
+
+if (detect == null) {
+    setTimeout(() => addTeacherVideo(sceneTeacher), 1000);
+}
 
 var played = false;
 var sdk = new araiSDK();
@@ -213,7 +221,7 @@ if (detect == null) {
     if (sdk.loadVideoSkeleton) {
         var json_path = "./assets/mock-videos/";
         
-        json_path += "dance.mp4.json" // "pressmaster.mp4.json" // 
+        json_path += "avatar.mp4.json" // "pressmaster.mp4.json" // 
         //console.log(json_path)
         sdk.loadVideoSkeleton(json_path,(json) => {
             teacherSkeleton = json;
@@ -245,22 +253,224 @@ function playTeacherVideo() {
     }
 }
 
+function find_angle(A,B,C) {
+    var AB = Math.sqrt(Math.pow(B.x-A.x,2)+ Math.pow(B.y-A.y,2) + Math.pow(B.z-A.z,2));
+    var BC = Math.sqrt(Math.pow(B.x-C.x,2)+ Math.pow(B.y-C.y,2) + Math.pow(B.z-C.z,2));
+    var AC = Math.sqrt(Math.pow(C.x-A.x,2)+ Math.pow(C.y-A.y,2) + Math.pow(C.z-A.z,2));
+    
+    var angle = Math.acos((BC*BC+AB*AB-AC*AC)/(2*BC*AB));
+
+    return Math.floor(angle * 180 / Math.PI);
+}
+
+// 11: Left Shoulder
+// 12: Right Shoulder
+// 13: Left Elbow
+// 14: Right Elbow
+// 15: Left Wrist
+// 16: Right Wrist
+// 23: Left Hip
+// 24: Right Hip
+// 1  2  3
+// 4  5  6
+// 7  8  9
+var delta = 25;
+function IsMatched(angleSH, numSH, angleSS, numSS) {
+    if (angleSH < (numSH - delta)) return false;
+    if (angleSH > (numSH + delta)) return false;
+    if (angleSS && angleSS < (numSS - delta)) return false;
+    if (angleSS && angleSS > (numSS + delta)) return false;
+    return true;
+}
+// 1  2   3        3  2   1
+// 4  5   6        6  5   4
+// 7  8   9        9  8   7
+const user_left     = ["#ul1", "#ul2", "#ul3", "#ul4", "#ul5", "#ul6", "#ul7", "#ul8", "#ul9"];
+const user_right    = ["#ur1", "#ur2", "#ur3", "#ur4", "#ur5", "#ur6", "#ur7", "#ur8", "#ur9"];
+const teacher_left  = ["#tl1", "#tl2", "#tl3", "#tl4", "#tl5", "#tl6", "#tl7", "#tl8", "#tl9"];
+const teacher_right = ["#tr1", "#tr2", "#tr3", "#tr4", "#tr5", "#tr6", "#tr7", "#tr8", "#tr9"];
+//const Wrist = results.poseLandmarks[15];
+//const Elbow = results.poseLandmarks[13];
+//const Shoulder = results.poseLandmarks[11];
+//const ShoulderO = results.poseLandmarks[12];
+//const Hip = results.poseLandmarks[23];
+
+// handShoulderHip = 135  left, handShoulder = 135
+// handShoulderHip = 180
+// handShoulderHip = 135 right, handShoulder = 45
+// handShoulderHip = 90  left, handShoulder = 180
+// handShoulderHip = 90 front, handShoulder = 90
+// handShoulderHip = 90 right, handShoulder = 0
+// handShoulderHip = 45 left , handShoulder = 135
+// handShoulderHip =  0  
+// handShoulderHip = 45 right , handShoulder = 45
+function updateAngle(elmList, angList) {
+    var elmHand     = document.querySelector(elmList.hand);
+    var elmShoulder = document.querySelector(elmList.shoulder);
+    var elmHip      = document.querySelector(elmList.hip);
+    
+    elmHand.innerText       = angList.hand + "";
+    elmShoulder.innerText   = angList.shoulder + ""
+    elmHip.innerText        = angList.hip + ""
+}
+
+const user_angle_left   = {hand: "#lAngleHand", shoulder: "#lAngleShoulder", hip: "#lAngleHip"};
+const user_angle_right  = {hand: "#rAngleHand", shoulder: "#rAngleShoulder", hip: "#rAngleHip"};
+function playLeftHand(results, uiMark, uiAngle) {
+    if (results.poseLandmarks == null) return;
+
+    var res = playGrid( uiMark, 
+                        results.poseLandmarks[15], // Wrist
+                        results.poseLandmarks[13], // Elbow
+                        results.poseLandmarks[11], // Shoulder
+                        results.poseLandmarks[12], // Shoulder Otherside
+                        results.poseLandmarks[23]) // Hip
+
+    if (uiAngle) updateAngle(uiAngle, res);
+
+    return res.ans;
+}
+
+function playRightHand(results, uiMark, uiAngle) {
+    if (results.poseLandmarks == null) return;
+
+    var res = playGrid(uiMark, 
+        results.poseLandmarks[16], // Wrist
+        results.poseLandmarks[14], // Elbow
+        results.poseLandmarks[12], // Shoulder
+        results.poseLandmarks[11], // Shoulder Otherside
+        results.poseLandmarks[24]) // Hip
+
+    if (uiAngle) updateAngle(uiAngle, res);
+
+    return res.ans;
+}
+
+function playGrid(cells, wrist, elbow, shoulder, shoulderO, hip) {
+    var elmList = new Array(9);
+    var ansList = new Array(9);
+
+    for (let i =0; i < 9; i++) {
+        elmList[i] = document.querySelector(cells[i]);
+    }
+    
+    // Right
+    var handSelf        = find_angle(wrist, elbow, shoulder);
+    var handShoulder    = find_angle(elbow, shoulder, shoulderO);
+    var handShoulderHip = find_angle(elbow, shoulder, hip);
+
+    console.log("HAND " + handSelf + " Shoulder " + handShoulder + " Hip " + handShoulderHip)
+
+
+    ansList[0]  = IsMatched(handShoulderHip, 135, handShoulder, 135)
+    ansList[1]  = IsMatched(handShoulderHip, 180)
+    ansList[2]  = IsMatched(handShoulderHip, 135, handShoulder,  45)
+    ansList[3]  = IsMatched(handShoulderHip,  90, handShoulder, 180)
+    ansList[4]  = IsMatched(handShoulderHip,  90, handShoulder,  90)
+    ansList[5]  = IsMatched(handShoulderHip,  90, handShoulder,   0)
+    ansList[6]  = IsMatched(handShoulderHip,  45, handShoulder, 135)
+    ansList[7]  = IsMatched(handShoulderHip,   0)
+    ansList[8]  = IsMatched(handShoulderHip,  45, handShoulder,  45)
+
+    for (let i=0; i <9; i++) {
+        if (ansList[i]) {
+            elmList[i].className = "cellON"
+        } else {
+            elmList[i].className = "cell"
+        }
+    }
+
+    return {hand: handSelf, shoulder: handShoulder, hip: handShoulderHip, ans: ansList}
+}
+
+window.changeTeacherSpeed = (speed) => {
+    if (null == teacherVideo) return;
+
+    teacherVideo.playbackRate = speed;
+}
+
+var score_teacher_left = null;
+var score_teacher_right = null;
+
 function playTeacherAnimator() {
-    var videoElement = document.querySelector("#teacher_video");
+    //var videoElement = document.querySelector("#teacher_video");
+    var videoElement = teacherVideo;
     if (! videoElement) return;
     if (! teacherSkeleton) return;
 
-    
+    console.log("play teacher")
     sdk.playResult(videoElement, teacherSkeleton, (results) => {
         var  vrm_results = results;
+        var  sk_results = sdk.mirrorResults(results)
         if (mirror) {
             vrm_results = sdk.mirrorResults(results)
+            sk_results = results;
         }
 
+        score_teacher_left  = playLeftHand(vrm_results, teacher_left)
+        score_teacher_right = playRightHand(vrm_results, teacher_right)
+        let canvas = document.querySelector('#teacherCanvas');
+
+        if (canvas && teacherVideo) {
+            canvas.style.width  = teacherVideo.videoWidth / 4;
+            canvas.style.height = teacherVideo.videoHeight / 4;
+
+            sdk.drawSkeleton(canvas, sk_results);
+        } else {
+            console.log("canvase or video is null, fail to play teacher skeleton")
+        }
+        
         var rig = animateVRM(teacherVrm, vrm_results);
     }) 
 }
 
+function findScore(results) {
+    if (results == null) return -1;
+    var match = -1;
+    
+    for (let i=0; i < 9; i++) {
+        if (results[i]) {
+            if (match != -1) console.log("warn, duplicate mactch")
+            match = i;
+        }
+    }
+
+    return match;
+}
+
+// 0 1 2
+// 3 4 5
+// 6 7 8
+var scoreMap = [
+//   0  1  2  3  4  5  6  7  8
+    [3, 1, 0, 1, 1, 0, 0, 0, 0], // 0
+    [1, 3, 1, 1, 1, 1, 0, 0, 0], // 1
+    [0, 1, 3, 0, 1, 1, 0, 0, 0], // 2
+    [1, 1, 0, 3, 1, 0, 1, 1, 0], // 3
+    [1, 1, 1, 1, 3, 1, 1, 1, 1], // 4
+    [0, 1, 1, 0, 1, 3, 0, 1, 1], // 5
+    [0, 0, 0, 1, 1, 0, 3, 1, 0], // 6
+    [0, 0, 0, 1, 1, 1, 1, 3, 1], // 7
+    [0, 0, 0, 0, 1, 1, 0, 1, 3], // 8
+]
+function countScore(userScore, teacherScore) {
+    if (userScore == null) return 0;
+    if (teacherScore == null) return 0;
+
+    var teacher = findScore(teacherScore);
+    var user    = findScore(userScore);
+
+    if (teacher == -1) return 0;
+    if (user == -1) return 0;
+
+    return scoreMap[teacher][user];
+}
+
+var curScore = 0;
+var pre_user_left   = -1;
+var pre_user_right  = -1;
+var pre_teacher_left    = -1;
+var pre_teacher_right   = -1;
 sdk.onCallback = (results) => {
     //return; // KILLME
     //console.log("enter callack");
@@ -274,7 +484,54 @@ sdk.onCallback = (results) => {
     } else {
         animateVRM(userVrm, vrm_results);
     }
-    //playTeacherAnimator()
+    var score_user_left  = playLeftHand(vrm_results, user_left, user_angle_left)
+    var score_user_right = playRightHand(vrm_results, user_right, user_angle_right)
+
+    var scoreUserLeft    = findScore(score_user_left)
+    var scoreUserRight   = findScore(score_user_right)
+    var scoreTeacherLeft = findScore(score_teacher_left)
+    var scoreTeacherRight= findScore(score_teacher_right)
+    var score_left  = countScore(score_user_left, score_teacher_left);
+    var score_right = countScore(score_user_right, score_teacher_right);
+    var elmLeft     = document.querySelector("#matchLeft")
+    var elmRight    = document.querySelector("#matchRight")
+    var elmScore    = document.querySelector("#scoreNum")
+    var elmHead     = document.querySelector(".battery_head")
+
+    if (score_left > 1) {
+        elmLeft.style.backgroundColor = "red"
+    } else {
+        elmLeft.style.backgroundColor = "white"
+    }
+    if (score_right > 1) {
+        elmRight.style.backgroundColor = "red"
+    } else {
+        elmRight.style.backgroundColor = "white"
+    }
+    
+    if (score_left > 0) score_left -= 1;
+    if (score_right > 0) score_right -= 1;
+
+    if ((score_left > 0) && (score_right > 0)) {
+        elmHead.style.backgroundColor = "#00FF00"
+    } else if ((score_left > 0) || (score_right > 0)) {
+        elmHead.style.backgroundColor = "#007F00"
+    } else {
+        elmHead.style.backgroundColor = "#7F7F7F"
+    }
+    if ((pre_user_left != scoreUserLeft) || (pre_teacher_left != scoreTeacherLeft )) {
+        curScore += score_left;
+        pre_user_left       = scoreUserLeft;
+        pre_teacher_left    = scoreTeacherLeft
+    }
+    if ((pre_user_right != scoreUserRight) || (pre_teacher_right != scoreTeacherRight )) {
+        curScore += score_right;
+        pre_user_right      = scoreUserRight;
+        pre_teacher_right   = scoreTeacherRight;
+    }
+    elmScore.innerHTML = Math.round(curScore/10) + ""
+    battery(curScore/10)
+    playTeacherAnimator()
     rendererUser.render(sceneUser, orbitCameraUser);
     rendererTeacher.render(sceneTeacher, orbitCameraTeacher);
 }
@@ -473,13 +730,15 @@ var elmNext  = document.querySelector("#btnNext");
 var elmDump  = document.querySelector("#btnDump");
 
 sdk.onFirst = () => {
-    return;
-    bindVideoControl("play",  elmPlay)
-    bindVideoControl("time",  elmTime)
-    bindVideoControl("range", elmRange)
-    bindVideoControl("back",  elmBack)
-    bindVideoControl("next",  elmNext)
-    bindVideoControl("dump",  elmDump)
+    //return;
+    if (detect) {
+        bindVideoControl("play",  elmPlay)
+        bindVideoControl("time",  elmTime)
+        bindVideoControl("range", elmRange)
+        bindVideoControl("back",  elmBack)
+        bindVideoControl("next",  elmNext)
+        bindVideoControl("dump",  elmDump)
+    }
 }
 
 
@@ -491,6 +750,7 @@ const animateVRM = (vrm, results) => {
     let videoElement = findMindARVideo();
 
     var rigPos = updateVRM(vrm, videoElement, results, DumpMode);
+    if (DumpMode) DumpMode = !DumpMode; // Keep One Stop Dump
     // Update model to render physics
     var delta = clock_1.getDelta();
     //console.log("clock 1=" + delta);

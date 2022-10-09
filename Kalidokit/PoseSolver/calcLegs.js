@@ -12,28 +12,60 @@ export const offsets = {
  * Calculates leg rotation angles
  * @param {Results} lm : array of 3D pose vectors from tfjs or mediapipe
  */
-/*
- 24, // 23: Left Hip
- 23, // 24: Right Hip
- 26, // 25: Left Knee
- 25, // 26: Right Knee
- 28, // 27: Left Ankle
- 27, // 28: Right Ankle
-*/
-export const calcLegs = (lm) => {
-    const rightUpperLegSphericalCoords  = Vector.getSphericalCoords(lm[23], lm[25], { x: "y", y: "z", z: "x" }); //Left Hip Knee
-    const leftUpperLegSphericalCoords   = Vector.getSphericalCoords(lm[24], lm[26], { x: "y", y: "z", z: "x" }); //Right Hip Knee
-    const rightLowerLegSphericalCoords  = Vector.getRelativeSphericalCoords(lm[23], lm[25], lm[27], {  //Left Hip Knee Ankle
+ // 11: Left Shoulder
+ // 12: Right Shoulder
+ // 23: Left  Hip
+ // 24: Right Hip
+ // 25: Left  Knee
+ // 26: Right Knee
+ // 27: Left  Ankle
+ // 28: Right Ankle
+ // 29: Left  Heel
+ // 30: Right Heel
+ // 31: Left  Foot Index
+ // 32: Right Foot Index
+export const calcLegs = (lm, debug) => {
+    const mp = {
+        lShould:lm[11],
+        rShould:lm[12],
+        lHip:   lm[23],
+        rHip:   lm[24],
+        lKnee:  lm[25],
+        rKnee:  lm[26],
+        lAnkle: lm[27],
+        rAnkle: lm[28],
+        lHeel:  lm[29],
+        rHeel:  lm[30],
+        lFoot:  lm[31],
+        rFoot:  lm[32]
+    }
+    const rightUpperLegSphericalCoords  = Vector.getSphericalCoords(lm[23], lm[25], { x: "y", y: "z", z: "x" });
+    const leftUpperLegSphericalCoords   = Vector.getSphericalCoords(lm[24], lm[26], { x: "y", y: "z", z: "x" });
+    const rightLowerLegSphericalCoords  = Vector.getRelativeSphericalCoords(lm[23], lm[25], lm[27], {
         x: "y",
         y: "z",
         z: "x",
     });
-    const leftLowerLegSphericalCoords   = Vector.getRelativeSphericalCoords(lm[24], lm[26], lm[28], { //Right Hip Knee Ankle
+    const leftLowerLegSphericalCoords   = Vector.getRelativeSphericalCoords(lm[24], lm[26], lm[28], {
         x: "y",
         y: "z",
         z: "x",
     });
     const hipRotation = Vector.findRotation(lm[23], lm[24]);
+
+    //KILLME
+    hipRotation.x = 0;
+    hipRotation.y = 0;
+    hipRotation.z = 0;
+    //END
+    
+    const calc = {
+        rU: rightUpperLegSphericalCoords,
+        lU: leftUpperLegSphericalCoords,
+        rL: rightLowerLegSphericalCoords,
+        lL: leftLowerLegSphericalCoords,
+        hip: hipRotation
+    }
     const UpperLeg = {
         r: new Vector({
             x: rightUpperLegSphericalCoords.theta,
@@ -76,6 +108,8 @@ export const calcLegs = (lm) => {
             UpperLeg,
             LowerLeg,
         },
+        mp: mp,
+        calc: calc
     };
 };
 /**

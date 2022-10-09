@@ -205,16 +205,22 @@ class araiSDK {
         loadModel(modelPath)
     
         this.onResults = (results) => {
-          var delta = clock_3.getDelta();
-          //console.log("clock 3 FPS=" + 1 / delta);
+            var delta = clock_3.getDelta();
+            //console.log("clock 3 FPS=" + 1 / delta);
 
+            let videoElement = document.querySelector("video");
+            let canvasElement = document.querySelector('.output_canvas');
+          
+            this.adjustCanvas(canvasElement, videoElement);
         //  return; // KILLME
         //   console.log("onResult")
         // Draw landmark guides
             if (this.mode == "detect") {
-              this.drawResults(results);
+                //this.drawResults(results);
+                this.detectVideo(results);
+                this.drawSkeleton(canvasElement, results);
             } else {
-              this.drawSkeleton(results);
+                this.drawSkeleton(canvasElement, results);
             }
         // Animate model
         //  animateVRM(results, results);
@@ -381,24 +387,26 @@ class araiSDK {
           //console.log(record.current + " / " +  this.sourceVideo().duration);
         }
       }
+      adjustCanvas(canvasElement, videoElement) {
+          canvasElement.style.width = videoElement.style.width;
+          canvasElement.style.height = videoElement.style.height;
+      }
+      /*
       drawResults (results) {
         //let videoElement = document.querySelector("video");
-        
-        this.detectVideo(results);
-        this.drawSkeleton(results);
-      }
-      drawSkeleton(results) {
-        let videoElement = document.querySelector("video");
+        let videoElement  = document.querySelector("video");
         let canvasElement = document.querySelector('.output_canvas');
-        let canvasCtx = canvasElement.getContext('2d');
-        //var srcVideo = this.sourceVideo();
-
-        this.currnt_time = Date.now();
-
         
-        canvasElement.style.width = videoElement.style.width;
-        canvasElement.style.height = videoElement.style.height;
-
+        //this.adjustCanvas(canvasElement, videoElement);
+        this.detectVideo(results);
+        this.drawSkeleton(canvasElement, videoElement, results);
+      }
+      */
+      drawSkeleton(canvasElement, results) {
+        let canvasCtx = canvasElement.getContext('2d');
+        
+        this.currnt_time = Date.now();
+        
         canvasCtx.save();
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
         //canvasCtx.drawImage(results.segmentationMask, 0, 0,

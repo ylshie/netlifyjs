@@ -38,18 +38,6 @@
         height: 360px;
         z-index: -1;  /* KILLME */
       }
-      #left_panel {
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        width: 100%; /*640px;*/
-        height: 100%;
-        z-index: -2;
-        /* background-color: red; */
-        background-image: url("./assets/concert_stage.jpg");
-        background-position: center;
-        background-size: cover;
-      }
       #right_panel {
         position: absolute;
         left: 0px;
@@ -72,6 +60,16 @@
         left: 10px;
         z-index: 4
       }
+      #teacherCanvas {
+        position: absolute;
+        left: 800px;
+        top: 0px;
+      }
+      @media (max-width: 400px){
+        #teacherCanvas {
+          left: 200px;
+        }
+      }
       #video_canvas {
         position: absolute;
         left: 0px;
@@ -89,18 +87,261 @@
       #btnRange {
         width: 300px;
       }
+      .motion {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 30px 30px 30px;
+        z-index: 3;
+      }
+      #scorePanel {
+          border-radius: 20px;
+          position: absolute; 
+          visibility: hidden;
+          left: 300px;
+          top: 0px;
+          opacity: 80;
+          background-color: white;
+      }
+      #matchPanel {
+          position: relative;
+          width: 100px;
+          height: 50px;
+          
+      }
+      #numberPanel {
+          width: 100px;
+          height: 50px;
+          text-align: center;
+          font-size: 28px;
+          color: gray;
+          
+      }
+      #matchLeft {
+          position: absolute;
+          border-top-left-radius: 20px;
+          left: 0px;
+          top: 0px;
+          width: 50px;
+          height: 50px;
+      }
+      #matchRight {
+          position: absolute;
+          border-top-right-radius: 20px;
+          left: 50px;
+          top: 0px;
+          width: 50px;
+          height: 50px;
+      }
+      #userM {
+          position: absolute;
+          visibility: hidden;
+          left: 0px;
+          top: 0px;
+      }
+      #teacherM {
+          position: absolute;
+          visibility: hidden;
+          left: 600px;
+          top: 0px;
+      }
+      .block {
+          position: relative;
+          width:  30px;
+          height: 30px;
+          border: 1px;
+          border-style: solid;
+          border-color: black;
+      }
+      .cell {
+        position: absolute;
+        top: 0px;
+        width:  15px;
+        height: 30px;
+        background-color: aquamarine;
+        opacity: 80%;
+      }
+      .cellON {
+        position: absolute;
+        top: 0px;
+        width:  15px;
+        height: 30px;
+        background-color: rgb(235, 118, 229);
+        opacity: 80%;
+      }
+      .motion > .cell {
+        width: 100px;
+        height: 100px;
+        background-color: rgb(253, 244, 76);
+      }
+      .angleinfo {
+          position: absolute;
+          visibility: hidden;
+          left: 0px;
+          top: 200px;
+          width: 300px;
+          height: 300px;
+          font-size: 60px;
+          background-color: aquamarine;
+          color: black
+      }
+      td {
+        width: 100px;
+      }
+      #ur1 {top: 0px; left: 15px}
+      #ur2 {top: 0px; left: 15px}
+      #ur3 {top: 0px; left: 15px}
+      #ur4 {top: 0px; left: 15px}
+      #ur5 {top: 0px; left: 15px}
+      #ur6 {top: 0px; left: 15px}
+      #ur7 {top: 0px; left: 15px}
+      #ur8 {top: 0px; left: 15px}
+      #ur9 {top: 0px; left: 15px}
+      #tr1 {top: 0px; left: 15px}
+      #tr2 {top: 0px; left: 15px}
+      #tr3 {top: 0px; left: 15px}
+      #tr4 {top: 0px; left: 15px}
+      #tr5 {top: 0px; left: 15px}
+      #tr6 {top: 0px; left: 15px}
+      #tr7 {top: 0px; left: 15px}
+      #tr8 {top: 0px; left: 15px}
+      #tr9 {top: 0px; left: 15px}
+      #battery_panel {
+        position: absolute;
+        left: 300px;
+        top: 150px;
+      }
+      @media (max-width: 400px){
+        #battery_panel {
+          left: 10px;
+          top: 10px;
+        }
+        .bar {
+          width: 20px;
+          margin-top: 3px;
+          padding: 10px;
+        }
+      }
+      .battery {
+        padding: 10px 10px;
+        /*height: 340px;*/
+        background-color: white;
+        border: solid 10px gray;
+        position: relative;
+        opacity: 80%;
+      }
+      .battery_head {
+        height: 20px;
+        width: 80%;
+        margin-left: 10%;
+        color: white;
+        text-align: center;
+        background-color: gray;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+      }
+      .bar {
+        cursor: pointer;
+        display: block; /* inline-block; */
+        width: 30px;
+        border: solid thin rgba(127, 127, 127, 0.5);
+        margin-top: 5px;
+        padding: 14px;
+        /*height: 0;*/
+        background: transparent;
+        transition: background 1s;
+      }
+      .bar.active {
+        background: limegreen;
+      }
     </style>
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
     <!--<video id="teacher_video" src="./assets/mock-videos/dance.mp4"></video>-->
-    <!--
-    <div id="root"></div>
-    <script src="./index.js" type="module"></script>
-    -->
     <!--<video id="input_video"></video> --KILL ME-->
-    <!--<div id="left_panel"></div>-->
+    <div id="scorePanel">
+        <div id="matchPanel">
+            <div id="matchLeft"></div>
+            <div id="matchRight"></div>
+        </div>
+        <div id="numberPanel">
+            <label></label>
+        </div>
+    </div>
+    <div id="battery_panel">
+      <div class="battery_head">
+          <label id="scoreNum">0</label>
+      </div>
+      <div class="battery">
+        <div class='bar' id='100'></div>
+        <div class='bar' id= '90'></div>
+        <div class='bar' id= '80'></div>
+        <div class='bar' id= '70'></div>
+        <div class='bar' id= '60'></div>
+        <div class='bar' id= '50'></div>
+        <div class='bar' id= '40'></div>
+        <div class='bar' id= '30'></div>
+        <div class='bar' id= '20'></div>
+        <div class='bar' id= '10'></div>
+      </div>
+    </div>
+    <div class="angleinfo">
+        <table style="font-size: 50px; text-align: right">
+            <th>
+                <td></td>
+                <td>Left</td>
+                <td>Right</td>
+            </th>
+            <tr>
+                <td>H:</td>
+                <td><label id="lAngleHand"></label></td>
+                <td><label id="rAngleHand"></label></td>
+            </tr>
+            <tr>
+                <td>S:</td>
+                <td><label id="lAngleShoulder"></label></td>
+                <td><label id="rAngleShoulder"></label></td>
+            </tr>
+            <tr>
+                <td>H:</td>
+                <td><label id="lAngleHip"></label></td>
+                <td><label id="rAngleHip"></label></td>
+            </tr>
+        </table>
+    </div>
+    <div id="userM" class="motion">
+      <div class="block"><div id="ul1" class="cell"></div><div id="ur3" class="cell"></div></div>
+      <div class="block"><div id="ul2" class="cell"></div><div id="ur2" class="cell"></div></div>
+      <div class="block"><div id="ul3" class="cell"></div><div id="ur1" class="cell"></div></div>
+      <div class="block"><div id="ul4" class="cell"></div><div id="ur6" class="cell"></div></div>
+      <div class="block"><div id="ul5" class="cell"></div><div id="ur5" class="cell"></div></div>
+      <div class="block"><div id="ul6" class="cell"></div><div id="ur4" class="cell"></div></div>
+      <div class="block"><div id="ul7" class="cell"></div><div id="ur9" class="cell"></div></div>
+      <div class="block"><div id="ul8" class="cell"></div><div id="ur8" class="cell"></div></div>
+      <div class="block"><div id="ul9" class="cell"></div><div id="ur7" class="cell"></div></div>
+   </div>
+   <div id="teacherM" class="motion">
+    <div class="block"><div id="tl1" class="cell"></div><div id="tr3" class="cell"></div></div>
+    <div class="block"><div id="tl2" class="cell"></div><div id="tr2" class="cell"></div></div>
+    <div class="block"><div id="tl3" class="cell"></div><div id="tr1" class="cell"></div></div>
+    <div class="block"><div id="tl4" class="cell"></div><div id="tr6" class="cell"></div></div>
+    <div class="block"><div id="tl5" class="cell"></div><div id="tr5" class="cell"></div></div>
+    <div class="block"><div id="tl6" class="cell"></div><div id="tr4" class="cell"></div></div>
+    <div class="block"><div id="tl7" class="cell"></div><div id="tr9" class="cell"></div></div>
+    <div class="block"><div id="tl8" class="cell"></div><div id="tr8" class="cell"></div></div>
+    <div class="block"><div id="tl9" class="cell"></div><div id="tr7" class="cell"></div></div>
+ </div>
     <div id="right_panel"></div>
+    <a class="abs logo" href="https://metawave.click" target="_blank">
+      <div style="display: flex;align-items: center;bottom: 0;right: 10px;">
+        <img class="logo" src="logo.png" alt="" style="height: 50px;">
+        <span class="title">MetaWave AI Lab</span>
+      </div>
+    </a>
+    <canvas class="output_canvas" width="1000px" height="720px" left="0px"></canvas>
+    <canvas id="video_canvas" width="600px" height="400px"></canvas>
+    <canvas id="teacherCanvas" width="600px" height="400px"></canvas>
+
     <div id="logobutton">
       <img src="./setting.svg" width="32px" height="32px"/>
     </div>
@@ -122,7 +363,6 @@
           <input id="user_opacity" type="range" min="1" max="100" value="80"/>
         </div>
         <div>
-          <!--
           <label>Mirror</label>
           <span class="switch-field">
             <input type="radio" id="radio-threeqq" name="mirror_switch" value="yes"/>
@@ -130,18 +370,16 @@
             <input type="radio" id="radio-fourqq" name="mirror_switch" value="no" checked/>
             <label for="radio-fourqq">No</label>
           </span>
-          -->
+          <label>Speed</label>
+          <select id="teacherSpeed">
+            <option value=1>1X</option>
+            <option value=0.5>0.5X</option>
+            <option value=0.2>0.2X</option>
+            <option value=2>2X</option>
+          </select>
         </div>
       </form>
     </div>
-    <a class="abs logo" href="https://metawave.click" target="_blank">
-      <div style="display: flex;align-items: center;bottom: 0;right: 10px;">
-        <img class="logo" src="logo.png" alt="" style="height: 50px;">
-        <span class="title">MetaWave AI Lab</span>
-      </div>
-    </a>
-    <canvas class="output_canvas" width="1000px" height="720px" left="0px"></canvas>
-    <canvas id="video_canvas" width="600px" height="400px"></canvas>
     <div id="video_controls">
         <button id="btnPlay">Pause</button>
         <button id="btnBack">B</button>
@@ -152,6 +390,7 @@
           <option value=1>1X</option>
           <option value=0.5>0.5X</option>
           <option value=0.2>0.2X</option>
+          <option value=0.2>0.1X</option>
           <option value=2>2X</option>
         </select>
         <button id="btnDump">V</button>
@@ -164,6 +403,8 @@
     var toggle  = document.querySelector("#toggle");
     var ui          = document.querySelector("#logobutton");
     var elmOpacity  = document.querySelector("#user_opacity");
+    var elmSpeed  = document.querySelector("#teacherSpeed");
+    var elmVC     = document.querySelector("#video_controls");
     
     var IsFullscreen = false;
     var IsPanel = false;
@@ -179,7 +420,14 @@
     } else {
         console.log("no message");
     }
+    if (detect) {
+        elmVC.style.visibility = "visible";
+    }
     
+    elmSpeed.onchange = (event) => {
+        changeTeacherSpeed(elmSpeed.value);
+    }
+
     for (var i = 0; i < rad.length; i++) {
         rad[i].addEventListener('change', function() {
             (prev) ? console.log(prev.value): null;
@@ -253,6 +501,27 @@
             }
         }
     }
+
+    window.battery = function battery(charge) {
+      var index = 0;
+      var list = document.querySelectorAll(".battery .bar")
+      list.forEach(
+        function(item) {
+          //console.log(item.id)
+
+          var power = Math.round(charge / 10 * 10);
+          var bar   = parseInt(item.id)
+          console.log("bar=" + bar + " power=" + power);
+          if (bar <= power) {
+              console.log("add active")
+              item.classList.add("active");
+              index++;
+          } else {
+              item.classList.remove("active");
+          }
+      });
+    }
+
   </script>
   
 </html>
