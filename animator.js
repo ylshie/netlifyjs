@@ -33,10 +33,11 @@ else
     mirror = false
     //import {GLTFLoader} from "./libs/GLTFLoader.js"
 
-var DumpMode = false;
 var config = {
-    showTeacherVideo: false,
+    showTeacherVideo: true,
+    showTeacherAvatar: false,
 }
+var DumpMode = false;
 
 //let x = xxx;
 /* THREEJS WORLD SETUP */
@@ -160,11 +161,14 @@ loadVRM(sceneUser, ashtraPath, (vrm) => {
     userVrm = vrm 
 })
 ///*
-loadVRM(sceneTeacher, teacherPath, (vrm) => {
-    vrm.scene.position.x = 0.5;
-    teacherVrm = vrm;
-    animate();
-})
+
+if (config.showTeacherAvatar) {
+    loadVRM(sceneTeacher, teacherPath, (vrm) => {
+        vrm.scene.position.x = 0.5;
+        teacherVrm = vrm;
+        animate();
+    })
+}
 //*/
 /*
 if (! detect) {
@@ -196,7 +200,7 @@ async function addTeacherVideo(scene) {
     const material = createChromaMaterial(texture, 0x00ff00);
     const plane = new THREE.Mesh(geometry, material);
     //plane.rotation.x = Math.PI/2;
-    plane.position.x = 0.6;
+    plane.position.x = 0.2; //0.6;
     plane.position.y = 1.1;
     plane.scale.multiplyScalar(1)
     
