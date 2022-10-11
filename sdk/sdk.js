@@ -48,7 +48,7 @@ class araiSDK {
     config = {
         usePos: true,
     }
-    mirrorResults(results) {
+    mirrorResults(results, offX=0) {
         var ret = {};
         
         if (results.poseLandmarks) {
@@ -69,7 +69,7 @@ class araiSDK {
                 const j = mirrorMap[i];
 
                 ret.poseLandmarks[i] = Object.assign({}, results.poseLandmarks[j])
-                ret.poseLandmarks[i].x = 2 * this.ref_x - ret.poseLandmarks[i].x;
+                ret.poseLandmarks[i].x = 2 * this.ref_x - ret.poseLandmarks[i].x - offX;
             }
         }
         

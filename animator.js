@@ -200,9 +200,9 @@ async function addTeacherVideo(scene) {
     const material = createChromaMaterial(texture, 0x00ff00);
     const plane = new THREE.Mesh(geometry, material);
     //plane.rotation.x = Math.PI/2;
-    plane.position.x = 0.2; //0.6;
-    plane.position.y = 1.1;
-    plane.scale.multiplyScalar(1)
+    plane.position.x = 0.4; //0.6;
+    plane.position.y = 1.0;
+    plane.scale.multiplyScalar(1.4)
     
 
     if (config.showTeacherVideo) {
@@ -482,7 +482,7 @@ sdk.onCallback = (results) => {
 
     playTeacherVideo();
     
-    var vrm_results = sdk.mirrorResults(results)
+    var vrm_results = sdk.mirrorResults(results, 0.5)
     if (detect) {
         animateVRM(teacherVrm, vrm_results);
     } else {
