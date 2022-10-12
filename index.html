@@ -29,6 +29,14 @@
     <script src="./animator.js" type="module"></script>
     <style>
       html, body {position: relative; margin: 0; width: 100%; height: 100%; overflow: hidden}
+      #FBLogin {
+        position: absolute;
+        visibility: hidden;
+        left: 48px;
+        top: 48px;
+        width: 100px;
+        height: 100px;
+      }
       #teacher_video {
         position: absolute;
         visibility: hidden; /* KILLME */
@@ -257,6 +265,9 @@
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
+    <div id="FBLogin">
+        <button id="fbLogin"></button>
+    </div>
     <!--<video id="teacher_video" src="./assets/mock-videos/dance.mp4"></video>-->
     <!--<video id="input_video"></video> --KILL ME-->
     <div id="scorePanel">
@@ -399,6 +410,20 @@
   </body>
   <!--<script src="./araisdk.prod.js" type="module"></script>-->
   <script>
+    var divFBLogin  = document.querySelector("#FBLogin");
+    var btnFLoginn  = document.querySelector("#fbLogin");
+
+    btnFLoginn.onclick = () => {
+        FB.login(function(response) {
+                  if (response.status === 'connected') {
+                      // Logged into your webpage and Facebook.
+                      console.log("login successfully")
+                  } else {
+                    // The person is not logged into your webpage or we are unable to tell. 
+                      console.log("login failed")
+                  }
+              });
+    }
     window.fbAsyncInit = function() {
       FB.init({
         appId            : '242351372483927',
@@ -426,15 +451,7 @@
             // login dialog with a user gesture, but the user may have
             // to log in to Facebook before authorizing your application.
               console.log("FB not login");
-              FB.login(function(response) {
-                  if (response.status === 'connected') {
-                      // Logged into your webpage and Facebook.
-                      console.log("login successfully")
-                  } else {
-                    // The person is not logged into your webpage or we are unable to tell. 
-                      console.log("login failed")
-                  }
-              });
+              divFBLogin.visibility = "visible"
           }
       });
     };
