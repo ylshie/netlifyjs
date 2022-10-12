@@ -270,6 +270,7 @@
   <body>
     <div id="FBLogin">
         <button id="btLogin">Login FB</button>
+        <label id="txLogin"></label>
     </div>
     <!--<video id="teacher_video" src="./assets/mock-videos/dance.mp4"></video>-->
     <!--<video id="input_video"></video> --KILL ME-->
@@ -539,6 +540,7 @@
   <script>
     var divFBLogin  = document.querySelector("#FBLogin");
     var btnFLoginn  = document.querySelector("#btLogin");
+    var txtFBLogin  = document.querySelector("#txLogin");
 
     btnFLoginn.onclick = () => {
         FB.login(function(response) {
@@ -546,11 +548,16 @@
                   if (response.status === 'connected') {
                       // Logged into your webpage and Facebook.
                       console.log("login successfully")
+                      btnFLoginn.style.visibility = "hidden";
+                      FB.api('/me', {fields: 'last_name'}, function(response) {
+                          console.log(response);
+                          txtFBLogin.innerText = response;
+                      });
                   } else {
                     // The person is not logged into your webpage or we are unable to tell. 
                       console.log("login failed")
                   }
-              });
+              },{scope: 'public_profile,email'});
     }
     console.log("before fbAsyncInit")
     window.fbAsyncInit = function() {
