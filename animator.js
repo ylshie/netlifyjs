@@ -251,7 +251,7 @@ function playTeacherVideo() {
         if (! playok) { // Safari
             videoElement.muted = true;
             videoElement.play()
-            console.log("play teacher video")
+            //console.log("play teacher video")
         }
         played = true;
     }
@@ -402,7 +402,7 @@ function playTeacherAnimator() {
     if (! videoElement) return;
     if (! teacherSkeleton) return;
 
-    console.log("play teacher")
+    //console.log("play teacher")
     sdk.playResult(videoElement, teacherSkeleton, (results) => {
         var  vrm_results = results;
         var  sk_results = sdk.mirrorResults(results)
@@ -434,7 +434,7 @@ function findScore(results) {
     
     for (let i=0; i < 9; i++) {
         if (results[i]) {
-            if (match != -1) console.log("warn, duplicate mactch")
+            //KILLME if (match != -1) console.log("warn, duplicate mactch")
             match = i;
         }
     }
