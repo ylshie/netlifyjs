@@ -551,7 +551,7 @@
                       btnFLoginn.style.visibility = "hidden";
                       FB.api('/me', {fields: 'last_name'}, function(response) {
                           console.log(response);
-                          txtFBLogin.innerText = response;
+                          txtFBLogin.innerText = response.last_name;
                       });
                   } else {
                     // The person is not logged into your webpage or we are unable to tell. 
