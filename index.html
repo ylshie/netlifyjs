@@ -559,7 +559,7 @@
                     // The person is not logged into your webpage or we are unable to tell. 
                       console.log("login failed")
                   }
-              });
+              }, {scope: 'email,user_likes'});
           }
       });
     };
