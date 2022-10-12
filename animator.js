@@ -363,7 +363,7 @@ function playGrid(cells, wrist, elbow, shoulder, shoulderO, hip) {
     var handShoulder    = find_angle(elbow, shoulder, shoulderO);
     var handShoulderHip = find_angle(elbow, shoulder, hip);
 
-    console.log("HAND " + handSelf + " Shoulder " + handShoulder + " Hip " + handShoulderHip)
+    //console.log("HAND " + handSelf + " Shoulder " + handShoulder + " Hip " + handShoulderHip)
 
 
     ansList[0]  = IsMatched(handShoulderHip, 135, handShoulder, 135)
