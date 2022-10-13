@@ -14,7 +14,6 @@
     <script src="https://unpkg.com/@pixiv/three-vrm@0.6.7/lib/three-vrm.js"></script>
     
     <script src="https://connect.facebook.net/en_US/sdk.js" crossorigin="anonymous"></script>
-    <!--<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>-->
     <!--<script src="./libs/three.js-r132/examples/jsm/renderers/CSS3DRenderer.js" type="module"></script>-->
     <!--<script src="./libs/CSS3DRenderer.js" type="module"></script>-->
     <!--<script src="./libs/mindar/mindar-image-three.prod.js"></script>-->
@@ -30,16 +29,6 @@
     <script src="./animator.js" type="module"></script>
     <style>
       html, body {position: relative; margin: 0; width: 100%; height: 100%; overflow: hidden}
-      #FBLogin {
-        position: absolute;
-        visibility: hidden;
-        left: 48%;
-        top: 48%;
-        width: 100px;
-        height: 100px;
-        z-index: 6;
-        background-color: aqua;
-      }
       #teacher_video {
         position: absolute;
         visibility: hidden; /* KILLME */
@@ -56,7 +45,7 @@
         width: 100%; /*calc(100% - 640px);*/
         height: 100%;
         z-index: -2;
-        background-image: url("./assets/concert_stage.jpg");
+        background-image: url("./assets/concert_stage_1.jpg");
         background-position: center;
         background-size: cover;
       }
@@ -218,8 +207,15 @@
       #tr9 {top: 0px; left: 15px}
       #battery_panel {
         position: absolute;
-        left: 300px;
-        top: 150px;
+        left: 200px;
+        bottom: 150px;
+      }
+      #new_battery_panel {
+        position: absolute;
+        left: 100px;
+        bottom: 50px;
+        width: 100px;
+        height: 400px;
       }
       @media (max-width: 400px){
         #battery_panel {
@@ -234,6 +230,7 @@
       }
       .battery {
         padding: 10px 10px;
+        visibility: hidden;
         /*height: 340px;*/
         background-color: white;
         border: solid 10px gray;
@@ -246,7 +243,7 @@
         margin-left: 10%;
         color: white;
         text-align: center;
-        background-color: gray;
+        background-color: #FFD03F;
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
       }
@@ -268,10 +265,6 @@
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
-    <div id="FBLogin">
-        <button id="btLogin">Login FB</button>
-        <label id="txLogin"></label>
-    </div>
     <!--<video id="teacher_video" src="./assets/mock-videos/dance.mp4"></video>-->
     <!--<video id="input_video"></video> --KILL ME-->
     <div id="scorePanel">
@@ -284,21 +277,115 @@
         </div>
     </div>
     <div id="battery_panel">
-      <div class="battery_head">
+      <!--<div class="battery_head">
           <label id="scoreNum">0</label>
-      </div>
+      </div>-->
       <div class="battery">
-        <div class='bar' id='100'></div>
-        <div class='bar' id= '90'></div>
-        <div class='bar' id= '80'></div>
-        <div class='bar' id= '70'></div>
-        <div class='bar' id= '60'></div>
-        <div class='bar' id= '50'></div>
-        <div class='bar' id= '40'></div>
-        <div class='bar' id= '30'></div>
-        <div class='bar' id= '20'></div>
-        <div class='bar' id= '10'></div>
+          <div class='bar' id='100'></div>
+          <div class='bar' id= '90'></div>
+          <div class='bar' id= '80'></div>
+          <div class='bar' id= '70'></div>
+          <div class='bar' id= '60'></div>
+          <div class='bar' id= '50'></div>
+          <div class='bar' id= '40'></div>
+          <div class='bar' id= '30'></div>
+          <div class='bar' id= '20'></div>
+          <div class='bar' id= '10'></div>
       </div>
+    </div>
+    <div id="new_battery_panel">
+      <div class="battery_head">
+        <label id="scoreNum">0</label>
+      </div>
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+            x="0px" y="0px" viewBox="0 0 265 1260" style="enable-background:new 0 0 265 2003;" xml:space="preserve"> 
+          <style type="text/css">
+            .st0{fill:url(#SVGID_1_);}
+          </style>
+          <g>
+            <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" 
+                    x1="188.601" y1="0.4993" x2="188.601" y2="255.2139" 
+                    gradientTransform="matrix(-1.836970e-16 -1 -1 1.836970e-16 267.0004 1190.3005)">
+              <stop  offset="0" 		  style="stop-color:#FFD03F"/>
+              <stop  offset="0.1968" 	style="stop-color:#FDCA3A"/>
+              <stop  offset="0.4642" 	style="stop-color:#F6B82B"/>
+              <stop  offset="0.7709" 	style="stop-color:#EB9C12"/>
+              <stop  offset="0.8989" 	style="stop-color:#E58E06"/>
+              <stop  offset="1" 		  style="stop-color:#DF8800"/>
+            </linearGradient>
+            <path class="st0" 
+                  d="M 265.4,18.5
+                     v 1066.4 
+                     c 0,10.1  -8.2,18.4 -18.4,18.4
+                     H 18.4
+                     c -10.1,0 -18.4-8.3 -18.4-18.4
+                     V 18.5
+                     C 0,8.3,8.3,0.1,18.4,0.1
+                     H 247
+                     C 257.2,0,265.4,8.3,265.4,18.5
+                     z 
+                     M 16,1084.9
+                     c 0,1.4,1.1,2.5,2.5,2.5
+                     H 247
+                     c 1.4,0,2.5-1.1,2.5-2.5
+                     V 18.5
+                     c 0-1.4-1.1-2.5-2.5-2.5
+                     H 18.4
+                     c -1.4,0-2.5,1.1-2.5,2.5
+                     v 1066.4
+                     H 16
+                     z"/>
+            
+            <g id="bbar" style="clip-path: polygon(20px 25px, 180px 25px, 180px 1055px, 20px 1055px);">
+              <linearGradient id="SVGID_LG" gradientUnits="userSpaceOnUse" 
+                      x1="-760" y1="810" x2="-760" y2="1065" 
+                      gradientTransform="matrix(-1.836970e-16 -1 1 -1.836970e-16 -811.0995 1190.3005)">
+                <stop  offset="0" 		  style="stop-color:#FFD03F"/>
+                <stop  offset="0.1968" 	style="stop-color:#FDCA3A"/>
+                <stop  offset="0.4642" 	style="stop-color:#F6B82B"/>
+                <stop  offset="0.7709" 	style="stop-color:#EB9C12"/>
+                <stop  offset="0.8989" 	style="stop-color:#E58E06"/>
+                <stop  offset="1" 		  style="stop-color:#DF8800"/>
+              </linearGradient>
+              <!--
+              <polygon style="fill:url(#SVGID_LG);" points="31,1933 224,1998 234,1968 41,1902 "/> 
+              <polygon style="fill:url(#SVGID_LG);" points="31,1874 224,1940 234,1909 41,1844 "/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1815 224,1881 234,1851 41,1784"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1757 224,1822 234,1792 41,1726"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1698 224,1764 234,1733 41,1668"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1639 224,1705 234,1675 41,1609"/>
+              
+              <polygon style="fill:url(#SVGID_LG);" points="31,1600 224,1665 234,1635 41,1580"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1540 224,1605 234,1575 41,1520"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1480 224,1545 234,1515 41,1460"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1420 224,1485 234,1455 41,1400"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1360 224,1425 234,1395 41,1330"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1300 224,1365 234,1335 41,1270"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1240 224,1305 234,1275 41,1210"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1180 224,1245 234,1215 41,1150"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1120 224,1185 234,1155 41,1090"/>
+              -->
+              <polygon style="fill:url(#SVGID_LG);" points="31,1060 224,1121 234,1095 41,1030"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,1000 224,1065 234,1035 41, 970"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 940 224,1005 234, 975 41, 910"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 880 224, 945 234, 915 41, 850"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 820 224, 885 234, 855 41, 790"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 760 224, 825 234, 795 41, 730"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 700 224, 765 234, 735 41, 670"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 640 224, 705 234, 675 41, 610"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 580 224, 645 234, 615 41, 550"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 520 224, 585 234, 555 41, 490"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 460 224, 525 234, 495 41, 430"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 400 224, 465 234, 435 41, 370"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 340 224, 405 234, 375 41, 310"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 280 224, 345 234, 315 41, 250"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 220 224, 285 234, 255 41, 190"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 160 224, 225 234, 195 41, 130"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31, 100 224, 165 234, 135 41,  70"/>
+              <polygon style="fill:url(#SVGID_LG);" points="31,  40 224, 105 234,  75 41,  10"/>
+            </g>
+          </g>
+        </svg>
     </div>
     <div class="angleinfo">
         <table style="font-size: 50px; text-align: right">
@@ -414,6 +501,40 @@
   </body>
   <!--<script src="./araisdk.prod.js" type="module"></script>-->
   <script>
+    console.log("set FB fbAsyncInit");
+    window.fbAsyncInit = function() {
+      console.log("before FB Init");
+      FB.init({
+        appId            : '5349091678523310',
+        autoLogAppEvents : true,
+        xfbml            : true,
+        version          : 'v15.0'
+      });
+      FB.getLoginStatus(function(response) {
+          if (response.status === 'connected') {
+              // The user is logged in and has authenticated your
+              // app, and response.authResponse supplies
+              // the user's ID, a valid access token, a signed
+              // request, and the time the access token 
+              // and signed request each expire.
+              var uid = response.authResponse.userID;
+              var accessToken = response.authResponse.accessToken;
+              console.log("FB connected");
+          } else if (response.status === 'not_authorized') {
+              // The user hasn't authorized your application.  They
+              // must click the Login button, or you must call FB.login
+              // in response to a user gesture, to launch a login dialog.
+              console.log("FB not authorized");
+          } else {
+            // The user isn't logged in to Facebook. You can launch a
+            // login dialog with a user gesture, but the user may have
+            // to log in to Facebook before authorizing your application.
+              console.log("FB not");
+          }
+      });
+    };
+  </script>
+  <script>
     var element = document.body;
     var toggle  = document.querySelector("#toggle");
     var ui          = document.querySelector("#logobutton");
@@ -516,7 +637,7 @@
             }
         }
     }
-
+/*
     window.battery = function battery(charge) {
       var index = 0;
       var list = document.querySelectorAll(".battery .bar")
@@ -526,9 +647,9 @@
 
           var power = Math.round(charge / 10 * 10);
           var bar   = parseInt(item.id)
-          //console.log("bar=" + bar + " power=" + power);
+          // console.log("bar=" + bar + " power=" + power);
           if (bar <= power) {
-              //console.log("add active")
+              console.log("add active")
               item.classList.add("active");
               index++;
           } else {
@@ -536,64 +657,31 @@
           }
       });
     }
-  </script>
-  <script>
-    /*
-    var divFBLogin  = document.querySelector("#FBLogin");
-    var btnFLoginn  = document.querySelector("#btLogin");
-    var txtFBLogin  = document.querySelector("#txLogin");
+*/
+    window.battery = function battery(charge) {
+        if (charge > 10) charge = 10;
 
-    btnFLoginn.onclick = () => {
-        FB.login(function(response) {
-                  console.log("FB login respose")
-                  if (response.status === 'connected') {
-                      // Logged into your webpage and Facebook.
-                      console.log("login successfully")
-                      btnFLoginn.style.visibility = "hidden";
-                      FB.api('/me', {fields: 'last_name'}, function(response) {
-                          console.log(response);
-                          txtFBLogin.innerText = response.last_name;
-                      });
-                  } else {
-                    // The person is not logged into your webpage or we are unable to tell. 
-                      console.log("login failed")
-                  }
-              },{scope: 'public_profile,email'});
+        var aBar  = document.querySelector("#bbar");
+        var y1    = 25 + 1030 * (10 - charge) / 10;
+
+        console.log(aBar.style.clipPath);
+        aBar.style.clipPath = "polygon(20px " + y1 + "px, 180px " + y1 + "px, 180px 1055px, 20px 1055px)"
     }
-    console.log("before fbAsyncInit")
-    window.fbAsyncInit = function() {
-      console.log("call FB.init")
-      FB.init({
-        appId            : '242351372483927',
-        autoLogAppEvents : true,
-        xfbml            : true,
-        version          : 'v15.0'
-      });
-      FB.getLoginStatus(function(response) {
-          if (response.status === 'connected') {
-              // The user is logged in and has authenticated your
-              // app, and response.authResponse supplies
-              // the user's ID, a valid access token, a signed
-              // request, and the time the access token 
-              // and signed request each expire.
-              var uid = response.authResponse.userID;
-              var accessToken = response.authResponse.accessToken;
-              console.log("FB connected");
-          } else if (response.status === 'not_authorized') {
-              // The user hasn't authorized your application.  They
-              // must click the Login button, or you must call FB.login
-              // in response to a user gesture, to launch a login dialog.
-              console.log("FB not authorized");
-          } else {
-            // The user isn't logged in to Facebook. You can launch a
-            // login dialog with a user gesture, but the user may have
-            // to log in to Facebook before authorizing your application.
-              console.log("FB not login and show divFBLogin");
-              divFBLogin.style.visibility = "visible"
-          }
-      });
-    };
-    fbAsyncInit();
-    */
+
+    //polygon(20px 25px, 180px 25px, 180px 1555px, 20px 1555px);"
+    var count = 0;
+    function animRect () {
+        if (count > 10) count = 10;
+
+        var aBar  = document.querySelector("#bbar");
+        var y1    = 25 + 1030 * (10 - count) / 10;
+        
+        console.log(aBar.style.clipPath);
+        aBar.style.clipPath = "polygon(20px " + y1 + "px, 180px " + y1 + "px, 180px 1055px, 20px 1055px)"
+        count ++;
+        
+        setTimeout(animRect, 1000)
+    }
+    //animRect();
   </script>
 </html>

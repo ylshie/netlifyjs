@@ -251,7 +251,7 @@ function playTeacherVideo() {
         if (! playok) { // Safari
             videoElement.muted = true;
             videoElement.play()
-            //console.log("play teacher video")
+            console.log("play teacher video")
         }
         played = true;
     }
@@ -521,7 +521,7 @@ sdk.onCallback = (results) => {
     } else if ((score_left > 0) || (score_right > 0)) {
         elmHead.style.backgroundColor = "#007F00"
     } else {
-        elmHead.style.backgroundColor = "#7F7F7F"
+        elmHead.style.backgroundColor = "#FFD03F" //"#7F7F7F" //gray
     }
     if ((pre_user_left != scoreUserLeft) || (pre_teacher_left != scoreTeacherLeft )) {
         curScore += score_left;
