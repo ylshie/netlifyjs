@@ -659,10 +659,10 @@
     }
 */
     window.battery = function battery(charge) {
-        if (charge > 10) charge = 10;
+        if (charge > 100) charge = 100;
 
         var aBar  = document.querySelector("#bbar");
-        var y1    = 25 + 1030 * (10 - charge) / 10;
+        var y1    = 25 + 1030 * (100 - charge) / 100;
 
         console.log(aBar.style.clipPath);
         aBar.style.clipPath = "polygon(20px " + y1 + "px, 180px " + y1 + "px, 180px 1055px, 20px 1055px)"
