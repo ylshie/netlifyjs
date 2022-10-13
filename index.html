@@ -671,10 +671,10 @@
     //polygon(20px 25px, 180px 25px, 180px 1555px, 20px 1555px);"
     var count = 0;
     function animRect () {
-        if (count > 10) count = 10;
+        if (count > 100) count = 100;
 
         var aBar  = document.querySelector("#bbar");
-        var y1    = 25 + 1030 * (10 - count) / 10;
+        var y1    = 25 + 1030 * (100 - count) / 100;
         
         console.log(aBar.style.clipPath);
         aBar.style.clipPath = "polygon(20px " + y1 + "px, 180px " + y1 + "px, 180px 1055px, 20px 1055px)"
