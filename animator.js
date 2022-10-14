@@ -187,7 +187,8 @@ window.changeTeacher = (video_file) => {
     if (teacherVideo == null) return;
 
     var json_path = "./assets/mock-videos/";
-    var height = (video_file == "avatar.mp4")? 1616/1080: 720/1280;
+    var height  = (video_file == "avatar.mp4")? 1616/1080: 720/1280;
+    var sclaeUp = (video_file == "avatar.mp4")? 1: 2;
 
     teacherVideo.pause();
     teacherVideo.src = json_path + video_file
@@ -197,7 +198,7 @@ window.changeTeacher = (video_file) => {
 
     teacherPlane.material = material;
     teacherPlane.scale.set(1, height, 1);
-    //teacherPlane.scale.multiplyScalar(1.4)
+    teacherPlane.scale.multiplyScalar(sclaeUp)
     
     json_path += video_file + ".json" 
 
@@ -430,11 +431,11 @@ function playTeacherAnimator() {
 
     //console.log("play teacher")
     sdk.playResult(videoElement, teacherSkeleton, (results) => {
-        var  vrm_results = results;
+        var  vrm_results= results;
         var  sk_results = sdk.mirrorResults(results, -0.2)
         if (mirror) {
             vrm_results = sdk.mirrorResults(results)
-            sk_results = results;
+            sk_results  = results;
         }
 
         score_teacher_left  = playLeftHand(vrm_results, teacher_left)
@@ -442,9 +443,14 @@ function playTeacherAnimator() {
         let teacherCanvas = document.querySelector('#teacherCanvas');
 
         if (teacherCanvas && teacherVideo) {
-            teacherCanvas.style.width  = teacherVideo.videoWidth / 4;
-            teacherCanvas.style.height = teacherVideo.videoHeight / 4;
-
+            if (teacherVideo.videoWidth > 1000) {
+                teacherCanvas.style.width  = teacherVideo.videoWidth / 4;
+                teacherCanvas.style.height = teacherVideo.videoHeight / 4;
+            } else {
+                teacherCanvas.style.width  = teacherVideo.videoWidth / 2;
+                teacherCanvas.style.height = teacherVideo.videoHeight / 2;
+            }
+            
             sdk.drawSkeleton(teacherCanvas, sk_results);
         } else {
             console.log("canvase or video is null, fail to play teacher skeleton")
