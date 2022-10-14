@@ -200,7 +200,7 @@ async function addTeacherVideo(scene) {
     const material = createChromaMaterial(texture, 0x00ff00);
     const plane = new THREE.Mesh(geometry, material);
     //plane.rotation.x = Math.PI/2;
-    plane.position.x = 0.4; //0.6;
+    plane.position.x = 0.6; //0.6;
     plane.position.y = 1.0;
     plane.scale.multiplyScalar(1.4)
     
@@ -413,13 +413,13 @@ function playTeacherAnimator() {
 
         score_teacher_left  = playLeftHand(vrm_results, teacher_left)
         score_teacher_right = playRightHand(vrm_results, teacher_right)
-        let canvas = document.querySelector('#teacherCanvas');
+        let teacherCanvas = document.querySelector('#teacherCanvas');
 
-        if (canvas && teacherVideo) {
-            canvas.style.width  = teacherVideo.videoWidth / 4;
-            canvas.style.height = teacherVideo.videoHeight / 4;
+        if (teacherCanvas && teacherVideo) {
+            teacherCanvas.style.width  = teacherVideo.videoWidth / 4;
+            teacherCanvas.style.height = teacherVideo.videoHeight / 4;
 
-            sdk.drawSkeleton(canvas, sk_results);
+            sdk.drawSkeleton(teacherCanvas, sk_results);
         } else {
             console.log("canvase or video is null, fail to play teacher skeleton")
         }
@@ -547,7 +547,7 @@ function adjustUserVideo(elm) {
 
     var targetHeight = winHeight;
     var targetWidth = video.videoWidth * targetHeight / video.videoHeight;
-    var posLeft = (winWidth - targetWidth) / 2;
+    var posLeft = 0; //(winWidth - targetWidth) / 2; // Video set to left 
     var posTop  = 0;
 
     if ((layout == "ar") || (layout == "a")) {
@@ -623,7 +623,7 @@ function adjustUserAvatar(rendererUser, orbitCameraUser) {
 
     if (userVrm) {
         if (screen.width > screen.height) {
-            userVrm.scene.position.x = -1;
+            userVrm.scene.position.x = -2;
         } else {
             userVrm.scene.position.x = -0.5;
         }
