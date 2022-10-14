@@ -405,7 +405,7 @@ function playTeacherAnimator() {
     //console.log("play teacher")
     sdk.playResult(videoElement, teacherSkeleton, (results) => {
         var  vrm_results = results;
-        var  sk_results = sdk.mirrorResults(results)
+        var  sk_results = sdk.mirrorResults(results, -0.5)
         if (mirror) {
             vrm_results = sdk.mirrorResults(results)
             sk_results = results;
@@ -482,7 +482,7 @@ sdk.onCallback = (results) => {
 
     playTeacherVideo();
     
-    var vrm_results = sdk.mirrorResults(results, 0.5)
+    var vrm_results = sdk.mirrorResults(results)
     if (detect) {
         animateVRM(teacherVrm, vrm_results);
     } else {
