@@ -197,7 +197,7 @@ window.changeTeacher = (video_file) => {
 
     teacherPlane.material = material;
     teacherPlane.scale.set(1, height, 1);
-    teacherPlane.scale.multiplyScalar(1.4)
+    //teacherPlane.scale.multiplyScalar(1.4)
     
     json_path += video_file + ".json" 
 
@@ -431,7 +431,7 @@ function playTeacherAnimator() {
     //console.log("play teacher")
     sdk.playResult(videoElement, teacherSkeleton, (results) => {
         var  vrm_results = results;
-        var  sk_results = sdk.mirrorResults(results, -0.5)
+        var  sk_results = sdk.mirrorResults(results, -0.2)
         if (mirror) {
             vrm_results = sdk.mirrorResults(results)
             sk_results = results;
