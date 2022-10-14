@@ -451,6 +451,21 @@
     <div id="setPanel">
       <form name="myForm">
         <div>
+          <label>Teacher</label>
+          <span class="switch-field">
+            <input type="radio" id="radio-0" name="teacher_switch" value="avatar.mp4" checked/>
+            <label for="radio-0">0</label>
+            <input type="radio" id="radio-1" name="teacher_switch" value="LUDIS-TK-ref-1.mp4" />
+            <label for="radio-1">1 </label>
+            <input type="radio" id="radio-2" name="teacher_switch" value="LUDIS-TK-ref-2.mp4" />
+            <label for="radio-2">2</label>
+            <input type="radio" id="radio-3" name="teacher_switch" value="LUDIS-TK-ref-3.mp4" />
+            <label for="radio-3">3</label>
+            <input type="radio" id="radio-4" name="teacher_switch" value="LUDIS-TK-ref-4.mp4" />
+            <label for="radio-4">4</label>
+          </span>
+        </div>
+        <div>
           <label>Layout</label>
           <span class="switch-field">
             <input type="radio" id="radio-three" name="layout_switch" value="ra" checked/>
@@ -547,6 +562,7 @@
     var IsPanel = false;
 
     var rad = document.myForm.layout_switch;
+    var tad = document.myForm.teacher_switch;
     var prev    = null;
     var prev_1  = null;
 
@@ -563,6 +579,17 @@
     
     elmSpeed.onchange = (event) => {
         changeTeacherSpeed(elmSpeed.value);
+    }
+
+    for (var i = 0; i < tad.length; i++) {
+        tad[i].addEventListener('change', function() {
+            (prev) ? console.log(prev.value): null;
+            if (this !== prev) {
+                prev = this;
+            }
+            console.log("change teacher to " + this.value)
+            changeTeacher(this.value)
+        });
     }
 
     for (var i = 0; i < rad.length; i++) {

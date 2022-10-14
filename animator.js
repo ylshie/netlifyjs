@@ -181,6 +181,32 @@ if (! detect) {
 */
 
 var teacherVideo = null;
+var teacherPlane = null;
+window.changeTeacher = (video_file) => {
+    if (sdk.loadVideoSkeleton == null) return;
+    if (teacherVideo == null) return;
+
+    var json_path = "./assets/mock-videos/";
+    var height = (video_file == "avatar.mp4")? 1616/1080: 720/1280;
+
+    teacherVideo.pause();
+    teacherVideo.src = json_path + video_file
+    
+    const texture = new THREE.VideoTexture(teacherVideo);
+    const material = createChromaMaterial(texture, 0x00ff00);
+
+    teacherPlane.material = material;
+    teacherPlane.scale.set(1, height, 1);
+    teacherPlane.scale.multiplyScalar(1.4)
+    
+    json_path += video_file + ".json" 
+
+    sdk.loadVideoSkeleton(json_path,(json) => {
+        teacherSkeleton = json;
+        teacherVideo.play();
+    });
+}
+
 async function addTeacherVideo(scene) {
     //const video = await loadVideo("./assets/mock-videos/avatar.mp4");
     const video = document.createElement("video");
@@ -194,7 +220,6 @@ async function addTeacherVideo(scene) {
     //video.play();
     video.pause();
     const texture = new THREE.VideoTexture(video);
-
     const geometry = new THREE.PlaneGeometry(1, 1616/1080);
     //const material = new THREE.MeshBasicMaterial({map: texture});
     const material = createChromaMaterial(texture, 0x00ff00);
@@ -204,6 +229,7 @@ async function addTeacherVideo(scene) {
     plane.position.y = 1.0;
     plane.scale.multiplyScalar(1.4)
     
+    teacherPlane = plane;
 
     if (config.showTeacherVideo) {
         scene.add(plane);
