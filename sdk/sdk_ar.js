@@ -40,7 +40,7 @@ const mindarThree = new window.MINDAR.IMAGE.MindARThree({
 // const mindarThree = MindARThree({
   container: document.body,
   //imageTargetSrc: './assets/targets/logo2.mind',
-  imageTargetSrc: './assets/targets/shirt_1.mind',
+  imageTargetSrc: './assets/targets/shirts.mind',
   filterMinCF: 1,
   filterBeta: 10000,
   missTolerance: 0,
@@ -98,7 +98,7 @@ function addDemoVideo() {
     video.muted = true;
     video.playsInline = true;
 
-    const anchor = mindarThree.addAnchor(0);
+    const anchor = mindarThree.addAnchor(1);
     const texture   = new THREE.VideoTexture(video);
     const geometry  = new THREE.PlaneGeometry(1, 990/890);
     const material  = createChromaMaterial(texture, 0x00ff00);
@@ -132,24 +132,51 @@ function addDemoVideo2() {
     video.loop = true;
     video.muted = true;
     video.playsInline = true;
-    video.play();
+    //video.play();
     video.pause();
-    const texture = new THREE.VideoTexture(video);
-    const geometry = new THREE.PlaneGeometry(1, 990/890);
-    const material = createChromaMaterial(texture, 0x00ff00);
-    const plane = new THREE.Mesh(geometry, material);
+    const texture   = new THREE.VideoTexture(video);
+    const geometry  = new THREE.PlaneGeometry(1, 990/890);
+    const material  = createChromaMaterial(texture, 0x00ff00);
+    const plane1    = new THREE.Mesh(geometry, material);
+    const plane2    = new THREE.Mesh(geometry, material);
     //plane.rotation.x = Math.PI/2;
     //plane.position.y = 0.0;
-    plane.scale.multiplyScalar(2);
+    //plane1.scale.multiplyScalar(2);
 
-    const anchor = mindarThree.addAnchor(0);
-    anchor.group.add(plane);
-
-    anchor.onTargetFound = () => {
+    const anchor1 = mindarThree.addAnchor(0);
+    const anchor2 = mindarThree.addAnchor(1);
+    anchor1.group.add(plane1);
+    anchor2.group.add(plane2);
+    
+    var count = 0
+    function playVideo() {
+        count ++
         video.play();
     }
-    anchor.onTargetLost = () => {
+    function stopVideo() {
+        count --
+        if (count == 0)
+          video.pause()
+    }
+    anchor1.onTargetFound = () => {
+    //    video.play();
+        console.log("anchor 1 found")
+        playVideo()
+    }
+    anchor2.onTargetFound = () => {
+    //  video.play();
+        console.log("anchor 2 found")
+        playVideo()
+    }
+    anchor1.onTargetLost = () => {
         //video.pause();
+        console.log("anchor 1 lost")
+        stopVideo()
+    }
+    anchor2.onTargetLost = () => {
+      //video.pause();
+        console.log("anchor 2 lost")
+        stopVideo()
     }
 }
 export function startMindAR(video_file) {
