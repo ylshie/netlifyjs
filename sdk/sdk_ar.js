@@ -5,7 +5,8 @@ import {CSS3DRenderer} from "./libs/three/CSS3DRenderer.js";
 import {mockWithVideo} from './libs/camera-mock.js';
 //import IMAGE from "./libs/mindar/src/image-target/index"
 //import MindARThree from "./libs/mindar/src/image-target/three.js"
-import MindARThree from "./libs/mindar/mindar-image-three.prod.js"
+import {MindARThree} from "./libs/mindar/mindar-image-three.prod.js"
+import {createChromaMaterial} from './libs/chroma-video.js';
 
 //
 const configVideo = {
@@ -38,7 +39,8 @@ export const loadModel = async(path) => {
 const mindarThree = new window.MINDAR.IMAGE.MindARThree({
 // const mindarThree = MindARThree({
   container: document.body,
-  imageTargetSrc: './assets/targets/logo2.mind',
+  //imageTargetSrc: './assets/targets/logo2.mind',
+  imageTargetSrc: './assets/targets/shirt_1.mind',
   filterMinCF: 1,
   filterBeta: 10000,
   missTolerance: 0,
@@ -65,8 +67,7 @@ function IsSafari() {
   return isSafari;
 }
 
-export function startMindAR(video_file) {
-  //  
+function addRaccoon() {
     const {renderer, scene, camera} = mindarThree;
 
     const anchor = mindarThree.addAnchor(0);
@@ -84,39 +85,91 @@ export function startMindAR(video_file) {
       anchor.group.add(raccoon.scene);
     }
 
-  const url = new URL(window.location);
-  let videofile = url.searchParams.get('video'); // => 'hello'
-  if (videofile) 
-      console.log("from video: " + videofile);
-  else
-      console.log("from webcam");
+    return renderer;
+}
+
+function addDemoVideo() {
+    const {renderer, scene, camera} = mindarThree;
+    const video = document.createElement("video");
+      
+    video.crossOrigin = "anonymous";
+    video.src = "./assets/mock-videos/girl.mp4"
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+
+    const anchor = mindarThree.addAnchor(0);
+    const texture   = new THREE.VideoTexture(video);
+    const geometry  = new THREE.PlaneGeometry(1, 990/890);
+    const material  = createChromaMaterial(texture, 0x00ff00);
+    const plane = new THREE.Mesh(geometry, material);
+    
+    plane.rotation.x = Math.PI/2;
+    plane.position.y = 0.7;
+    plane.scale.multiplyScalar(4);
+
+    anchor.group.add(plane);
+    
+    anchor.onTargetFound = () => {
+      video.play();
+    }
+    anchor.onTargetLost = () => {
+      video.pause();
+    }
+
+    scene.add(plane);
+
+    return renderer;
+}
+
+function addDemoVideo2() {
+    const {renderer, scene, camera} = mindarThree;
+
+    const video = document.createElement("video");
+    video.crossOrigin = "anonymous";
+    //video.src = "./assets/videos/guitar-player.mp4"
+    video.src = "./assets/mock-videos/girl.mp4"
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.play();
+    video.pause();
+    const texture = new THREE.VideoTexture(video);
+    const geometry = new THREE.PlaneGeometry(1, 990/890);
+    const material = createChromaMaterial(texture, 0x00ff00);
+    const plane = new THREE.Mesh(geometry, material);
+    //plane.rotation.x = Math.PI/2;
+    //plane.position.y = 0.0;
+    plane.scale.multiplyScalar(2);
+
+    const anchor = mindarThree.addAnchor(0);
+    anchor.group.add(plane);
+
+    anchor.onTargetFound = () => {
+        video.play();
+    }
+    anchor.onTargetLost = () => {
+        //video.pause();
+    }
+}
+export function startMindAR(video_file) {
+    const {renderer, scene, camera} = mindarThree;
+    const url = new URL(window.location);
+    
+    //addRaccoon();
+    addDemoVideo2();
+
+    let videofile = url.searchParams.get('video'); // => 'hello'
+    if (videofile) 
+        console.log("from video: " + videofile);
+    else
+        console.log("from webcam");
 
   
   const start = async() => {
       if (videofile) {
-          //mockWithVideo("./assets/mock-videos/face1.mp4")
-          //sourceVideo = mockWithVideo("./assets/mock-videos/" + videofile)
           sourceVideo = mockWithVideo("http://localhost:3000/" + videofile)
           sourceDuration = sourceVideo.duration;
-          /*
-          var jsonFile = "http://localhost:3000/dance.json";
-          //var json = JSON.parse(jsonFile);
-
-          var request = new XMLHttpRequest();
-          
-          request.open("GET", jsonFile, false);
-          request.onreadystatechange = function() {
-            if ( request.readyState === 4 && request.status === 200 ) {
-              console.log("json file ready")
-              var json = JSON.parse(request.responseText);
-              console.log(request.responseText);
-            }
-          }
-          request.onprogress = (event) => { 
-              connsole.log("downloaded " + event.lengthComputable + " of " + event.total)
-          }
-          request.send(null);
-          */
       }
       //} else {
       await mindarThree.start();
