@@ -139,10 +139,7 @@ function addDemoVideo2() {
     const material  = createChromaMaterial(texture, 0x00ff00);
     const plane1    = new THREE.Mesh(geometry, material);
     const plane2    = new THREE.Mesh(geometry, material);
-    //plane.rotation.x = Math.PI/2;
-    //plane.position.y = 0.0;
-    //plane1.scale.multiplyScalar(2);
-
+    
     const anchor1 = mindarThree.addAnchor(0);
     const anchor2 = mindarThree.addAnchor(1);
     anchor1.group.add(plane1);

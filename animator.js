@@ -208,6 +208,15 @@ window.changeTeacher = (video_file) => {
     });
 }
 
+function IsSafari() {
+    // Safari 3.0+ "[object HTMLElementConstructor]" 
+    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
+
+    console.log("IsSafari=" + (isSafari ? "yes": "no") + " user agent=" + navigator.userAgent)
+
+    return isSafari;
+}
+
 async function addTeacherVideo(scene) {
     //const video = await loadVideo("./assets/mock-videos/avatar.mp4");
     const video = document.createElement("video");
@@ -215,7 +224,9 @@ async function addTeacherVideo(scene) {
     //video.id = "teacher_video";
     video.src = "./assets/mock-videos/avatar.mp4"
     video.loop = true;
-    video.muted = true;
+    if (IsSafari()) {
+        video.muted = true;
+    }
     video.playsInline = true;
 
     //video.play();
