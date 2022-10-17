@@ -313,105 +313,106 @@ class araiSDK {
             this.holistic.onResults(this.onResults);
         }
         this.hook_video()
-      };
+    };
 
-      sendFormData(data) {
-        const formData = new FormData();
+    sendFormData(data) {
+      const formData = new FormData();
 
-        formData.append("name", "dance");
-        
-        // HTML file input, chosen by user
-        //formData.append("userfile", fileInputElement.files[0]);
-        
-        // JavaScript file-like object
-        const content = '<q id="a"><span id="b">hey!</span></q>'; // the body of the new file…
-        const blob = new Blob([JSON.stringify(data)], { type: "text/json"});
-        
-        formData.append("file", blob);
-        
-        const request = new XMLHttpRequest();
-        request.open("POST", "http://localhost:3000/upload");
-        request.send(formData);
-      }
-
-      detectVideo(results) {
-        //let videoElement = document.querySelector("video");
-        var srcVideo = this.sourceVideo();
-        if (srcVideo == null) return;
-
-        if (this.first) {
-          this.first = false;
-          
-          srcVideo.pause();
-          srcVideo.currentTime = 0; // if this is far enough away from current, it implies a "play" call as well...oddly. I mean seriously that is junk.
-          // however if it close enough, then we need to call play manually
-          // some shenanigans to try and work around this:
-          var timer = setInterval(function() {
-              if (srcVideo.paused && srcVideo.readyState ==4 || !srcVideo.paused) {
-                this.start_time = Date.now();
-                srcVideo.play();
-                clearInterval(timer);
-              }       
-          }, 50);
-        }
+      formData.append("name", "dance");
       
-        // TO_DO
-        if (srcVideo.currentTime >= (srcVideo.duration - 0.1)) {
-          if (this.jsonFile == null) {
-            this.jsonFile = this.tmpFile;
-            this.tmpFile = null;
-            console.log(this.jsonFile);
-            this.sendFormData(this.jsonFile);
-            srcVideo.pause();
-            this.mode = "playback";
-            srcVideo.currentTime = 0;
-            //srcVideo.play(); // KILLME
-            const playButton = document.createElement("button");
-            playButton.innerHTML = "start";
-            playButton.style.position = 'fixed';
-            playButton.style.zIndex = 10000;
-            document.body.appendChild(playButton);
+      // HTML file input, chosen by user
+      //formData.append("userfile", fileInputElement.files[0]);
+      
+      // JavaScript file-like object
+      const content = '<q id="a"><span id="b">hey!</span></q>'; // the body of the new file…
+      const blob = new Blob([JSON.stringify(data)], { type: "text/json"});
+      
+      formData.append("file", blob);
+      
+      const request = new XMLHttpRequest();
+      request.open("POST", "http://localhost:3000/upload");
+      request.send(formData);
+    }
 
-            playButton.addEventListener('click', () => {
+    detectVideo(results) {
+      //let videoElement = document.querySelector("video");
+      var srcVideo = this.sourceVideo();
+      if (srcVideo == null) return;
+
+      if (this.first) {
+        this.first = false;
+        
+        srcVideo.pause();
+        srcVideo.currentTime = 0; // if this is far enough away from current, it implies a "play" call as well...oddly. I mean seriously that is junk.
+        // however if it close enough, then we need to call play manually
+        // some shenanigans to try and work around this:
+        var timer = setInterval(function() {
+            if (srcVideo.paused && srcVideo.readyState ==4 || !srcVideo.paused) {
+              this.start_time = Date.now();
               srcVideo.play();
-              document.body.removeChild(playButton);
-            });
-          }
-          return;
-        }
-
-        var offset = this.currnt_time - this.start_time;
-        var record = {offset: offset}
-
-        if (srcVideo)
-          record.current = srcVideo.currentTime; //videoElement.currentTime;
-        if (results.poseLandmarks) {
-          record.poseLandmarks = results.poseLandmarks;
-        }
-        if (results.poseWorldLandmarks) {
-          record.poseWorldLandmarks = results.poseWorldLandmarks;
-        }
-        if (results.ea) {
-          record.ea = results.ea;
-        }
-        if (results.faceLandmarks) {
-          record.faceLandmarks = results.faceLandmarks;
-        }
-        if (results.rightHandLandmarks) {
-          record.rightHandLandmarks = results.rightHandLandmarks;
-        }
-        if (results.leftHandLandmarks) {
-          record.leftHandLandmarks = results.leftHandLandmarks;
-        }
-        if (this.mode == "detect") {
-          this.tmpFile[record.current] = record;
-          //console.log(record.current + " / " +  this.sourceVideo().duration);
-        }
+              clearInterval(timer);
+            }       
+        }, 50);
       }
-      adjustCanvas(canvasElement, videoElement) {
-          canvasElement.style.width = videoElement.style.width;
-          canvasElement.style.height = videoElement.style.height;
+    
+      // TO_DO
+      if (srcVideo.currentTime >= (srcVideo.duration - 0.1)) {
+        if (this.jsonFile == null) {
+          this.jsonFile = this.tmpFile;
+          this.tmpFile = null;
+          console.log(this.jsonFile);
+          this.sendFormData(this.jsonFile);
+          srcVideo.pause();
+          this.mode = "playback";
+          srcVideo.currentTime = 0;
+          //srcVideo.play(); // KILLME
+          const playButton = document.createElement("button");
+          playButton.innerHTML = "start";
+          playButton.style.position = 'fixed';
+          playButton.style.zIndex = 10000;
+          document.body.appendChild(playButton);
+
+          playButton.addEventListener('click', () => {
+            srcVideo.play();
+            document.body.removeChild(playButton);
+          });
+        }
+        return;
       }
+
+      var offset = this.currnt_time - this.start_time;
+      var record = {offset: offset}
+
+      if (srcVideo)
+        record.current = srcVideo.currentTime; //videoElement.currentTime;
+      if (results.poseLandmarks) {
+        record.poseLandmarks = results.poseLandmarks;
+      }
+      if (results.poseWorldLandmarks) {
+        record.poseWorldLandmarks = results.poseWorldLandmarks;
+      }
+      if (results.ea) {
+        record.ea = results.ea;
+      }
+      if (results.faceLandmarks) {
+        record.faceLandmarks = results.faceLandmarks;
+      }
+      if (results.rightHandLandmarks) {
+        record.rightHandLandmarks = results.rightHandLandmarks;
+      }
+      if (results.leftHandLandmarks) {
+        record.leftHandLandmarks = results.leftHandLandmarks;
+      }
+      if (this.mode == "detect") {
+        this.tmpFile[record.current] = record;
+        //console.log(record.current + " / " +  this.sourceVideo().duration);
+      }
+    }
+
+    adjustCanvas(canvasElement, videoElement) {
+        canvasElement.style.width = videoElement.style.width;
+        canvasElement.style.height = videoElement.style.height;
+    }
       /*
       drawResults (results) {
         //let videoElement = document.querySelector("video");
@@ -423,7 +424,11 @@ class araiSDK {
         this.drawSkeleton(canvasElement, videoElement, results);
       }
       */
-      drawSkeleton(canvasElement, results) {
+
+    vrmSkeleton(canvas, vrm) {
+
+    }
+    drawSkeleton(canvasElement, results) {
         let canvasCtx = canvasElement.getContext('2d');
         
         this.currnt_time = Date.now();
@@ -459,9 +464,9 @@ class araiSDK {
           drawLandmarks(canvasCtx, results.rightHandLandmarks,
                         {color: '#FF0000', lineWidth: 2});
         canvasCtx.restore();
-      };
-  }
+    };
+}
 
-  window.araiSDK = araiSDK;
+window.araiSDK = araiSDK;
 
   

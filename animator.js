@@ -212,6 +212,17 @@ window.changeTeacher = (video_file) => {
     
     json_path += video_file + ".json" 
 
+    var elmSK   = document.querySelector("#teacherCanvas");
+    var elmVRM  = rendererTeacher.domElement;
+
+    if (video_file == "girl.mp4") {
+        elmSK.style.visibility  = "hidden";
+        elmVRM.style.visibility = "hidden";
+    } else {
+        elmSK.style.visibility  = "visible";
+        elmVRM.style.visibility = "visible";
+    }
+
     sdk.loadVideoSkeleton(json_path,(json) => {
         teacherSkeleton = json;
         sdk.centerResult(teacherSkeleton);
@@ -569,7 +580,7 @@ sdk.onCallback = (results) => {
         elmRight.style.backgroundColor = "white"
     }
     
-    if (score_left > 0) score_left -= 1;
+    if (score_left > 0)  score_left -= 1;
     if (score_right > 0) score_right -= 1;
 
     if ((score_left > 0) && (score_right > 0)) {
@@ -602,7 +613,7 @@ function adjustUserVideo(elm) {
     var winWidth    = window.innerWidth;
 
     var targetHeight = winHeight;
-    var targetWidth = video.videoWidth * targetHeight / video.videoHeight;
+    var targetWidth  = video.videoWidth * targetHeight / video.videoHeight;
     var posLeft = 0; //(winWidth - targetWidth) / 2; // Video set to left 
     var posTop  = 0;
 
@@ -816,6 +827,9 @@ const animateVRM = (vrm, results) => {
     //console.log("clock 1=" + delta);
     vrm.update(delta);
     
+    //checkNodes();
+    //console.log(vrm.humanoid.humanBones)
+
     return rigPos;
 };
 

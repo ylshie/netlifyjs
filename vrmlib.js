@@ -41,7 +41,10 @@ export function loadVRM(_scene, vrmPath, onLoaded = null) {
     );
 }
 
-
+export const checkNodes = () => {
+    console.log(THREE.VRMSchema.HumanoidBoneName);
+    
+}
 // Animate Rotation Helper function
 export const rigRotation = (_currentVrm, name, rotation = { x: 0, y: 0, z: 0 }, dampener = 1, lerpAmount = 0.3) => {
     if (!_currentVrm) {
