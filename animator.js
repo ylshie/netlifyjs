@@ -179,7 +179,15 @@ if (! detect) {
     })
 }
 */
-
+/*
+const sizeMap = {
+    "dannce.mp4": 1616/1080,
+    "tk_1.mp4": 720/960,
+    "tk_1.mp4": 720/960,
+    "tk_1.mp4": 720/960,
+    "tk_1.mp4": 720/960,
+}
+*/
 var teacherVideo = null;
 var teacherPlane = null;
 window.changeTeacher = (video_file) => {
@@ -187,17 +195,19 @@ window.changeTeacher = (video_file) => {
     if (teacherVideo == null) return;
 
     var json_path = "./assets/mock-videos/";
-    var height  = (video_file == "avatar.mp4")? 1616/1080: 720/1280;
-    var sclaeUp = (video_file == "avatar.mp4")? 1: 2;
+    var height  = (video_file == "avatar.mp4")? 1616/1080: ((video_file == "girl.mp4") ?  990/890: 720/960);
+    var sclaeUp = (video_file == "avatar.mp4")? 1.4: ((video_file == "girl.mp4") ?  2: 3);
 
     teacherVideo.pause();
     teacherVideo.src = json_path + video_file
     
     const texture = new THREE.VideoTexture(teacherVideo);
     const material = createChromaMaterial(texture, 0x00ff00);
+    const geometry = new THREE.PlaneGeometry(1, height);
 
     teacherPlane.material = material;
-    teacherPlane.scale.set(1, height, 1);
+    teacherPlane.geometry = geometry;
+    teacherPlane.scale.set(1, 1, 1);
     teacherPlane.scale.multiplyScalar(sclaeUp)
     
     json_path += video_file + ".json" 
@@ -205,7 +215,7 @@ window.changeTeacher = (video_file) => {
     sdk.loadVideoSkeleton(json_path,(json) => {
         teacherSkeleton = json;
         sdk.centerResult(teacherSkeleton);
-        
+
         teacherVideo.play();
     });
 }
