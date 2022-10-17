@@ -204,6 +204,8 @@ window.changeTeacher = (video_file) => {
 
     sdk.loadVideoSkeleton(json_path,(json) => {
         teacherSkeleton = json;
+        sdk.centerResult(teacherSkeleton);
+        
         teacherVideo.play();
     });
 }
@@ -444,7 +446,7 @@ function playTeacherAnimator() {
     //console.log("play teacher")
     sdk.playResult(videoElement, teacherSkeleton, (results) => {
         var  vrm_results= results;
-        var  sk_results = sdk.mirrorResults(results, -0.2)
+        var  sk_results = sdk.mirrorResults(results)  // -0.2
         if (mirror) {
             vrm_results = sdk.mirrorResults(results)
             sk_results  = results;

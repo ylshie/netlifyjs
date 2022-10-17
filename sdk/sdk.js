@@ -48,6 +48,31 @@ class araiSDK {
     config = {
         usePos: true,
     }
+    centerResult(curJson) {
+      var  minX   = 10;
+      var  maxX   = -10;
+      var  minWX  = 10;
+      var  maxWX  = -10;
+
+      for (const key in curJson) {
+          const record = curJson[key];
+
+          if (record.poseLandmarks == null) continue;
+          if (record.poseWorldLandmarks == null) continue;
+
+          for (let i=0; i < record.poseLandmarks.length; i++) {
+              minX = (minX > record.poseLandmarks) ? record.poseLandmarks: minX
+              maxX = (maxX < record.poseLandmarks) ? record.poseLandmarks: maxX
+          }
+          for (let i=0; i < record.poseLandmarks.length; i++) {
+              minWX = (minWX > record.poseLandmarks) ? record.poseLandmarks: minWX
+              maxWX = (maxWX < record.poseLandmarks) ? record.poseLandmarks: maxWX
+        }
+      }
+
+      this.ref_x  = (minX + maxX) / 2;
+      this.ref_wx = (minWX + maxWX) / 2;
+    }
     mirrorResults(results, offX=0) {
         var ret = {};
         
@@ -83,14 +108,10 @@ class araiSDK {
               const j = mirrorMap[i];
 
               ret.poseWorldLandmarks[i] = Object.assign({}, results.poseWorldLandmarks[j])
-              ret.poseWorldLandmarks[i].x = 2 * this.ref_wx - ret.poseWorldLandmarks[i].x;
+              ret.poseWorldLandmarks[i].x = 2 * this.ref_wx - ret.poseWorldLandmarks[i].x - offX;
           }
         }
         
-        //console.log(results);
-        //console.log("to");
-        //console.log(ret);
-
         return ret;
     }
     loadVideoSkeleton(path, onLoaded = null) {
