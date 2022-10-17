@@ -224,9 +224,9 @@ async function addTeacherVideo(scene) {
     //video.id = "teacher_video";
     video.src = "./assets/mock-videos/avatar.mp4"
     video.loop = true;
-    if (IsSafari()) {
+    //if (IsSafari()) {
         video.muted = true;
-    }
+    //}
     video.playsInline = true;
 
     //video.play();
@@ -249,6 +249,7 @@ async function addTeacherVideo(scene) {
     
     video.play();
     teacherVideo = video;
+    setTimeout(() => teacherVideo.muted = false, 5000);
 }
 
 if (detect == null) {
