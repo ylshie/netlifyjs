@@ -41,9 +41,17 @@ export function loadVRM(_scene, vrmPath, onLoaded = null) {
     );
 }
 
-export const checkNodes = () => {
+export const checkNodes = (_currentVrm) => {
     console.log(THREE.VRMSchema.HumanoidBoneName);
-    
+
+    var namelist = THREE.VRMSchema.HumanoidBoneName;
+
+    Object.keys(namelist).forEach(key => {
+        var name = namelist[key];
+
+        const part = _currentVrm.humanoid.getBoneNode(name);
+        console.log(part);
+    });
 }
 // Animate Rotation Helper function
 export const rigRotation = (_currentVrm, name, rotation = { x: 0, y: 0, z: 0 }, dampener = 1, lerpAmount = 0.3) => {

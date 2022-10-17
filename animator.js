@@ -2,7 +2,7 @@ import * as Kalidokit from "./Kalidokit"
 import * as xxx from "./sdk/build/araisdk.prod"
 //import * as xxx from "./sdk/build/araisdk.dm"
 //import {currentVrm, updateVRM, loadVRM, setVRM}from "./vrmlib"
-import {updateVRM, loadVRM}from "./vrmlib"
+import {checkNodes, updateVRM, loadVRM}from "./vrmlib"
 //import {loadVideo} from './sdk/libs/camera-mock.js';
 import {createChromaMaterial} from './sdk/libs/chroma-video.js';
 
@@ -214,13 +214,16 @@ window.changeTeacher = (video_file) => {
 
     var elmSK   = document.querySelector("#teacherCanvas");
     var elmVRM  = rendererTeacher.domElement;
+    var elmUser = rendererUser.domElement;
 
     if (video_file == "girl.mp4") {
         elmSK.style.visibility  = "hidden";
         elmVRM.style.visibility = "hidden";
+        elmUser.style.visibility = "hidden";
     } else {
         elmSK.style.visibility  = "visible";
         elmVRM.style.visibility = "visible";
+        elmUser.style.visibility = "visible";
     }
 
     sdk.loadVideoSkeleton(json_path,(json) => {
@@ -827,7 +830,7 @@ const animateVRM = (vrm, results) => {
     //console.log("clock 1=" + delta);
     vrm.update(delta);
     
-    //checkNodes();
+    //checkNodes(vrm);
     //console.log(vrm.humanoid.humanBones)
 
     return rigPos;
