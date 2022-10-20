@@ -10,12 +10,14 @@ import { PI } from "./../constants";
  // 12: Right Shoulder
  // 23: Left Hip
  // 24: Right Hip
-export const calcHips = (lm3d, lm2d, debug=false) => {
+export const calcHips = calcHips_Orig; //calcHips_New;
+
+function calcHips_Orig(lm3d, lm2d, debug=false)  {
     //Find 2D normalized Hip and Shoulder Joint Positions/Distances
-    const hipLeft2d         = Vector.fromArray(lm2d[23]);
-    const hipRight2d        = Vector.fromArray(lm2d[24]);
-    const shoulderLeft2d    = Vector.fromArray(lm2d[11]);
-    const shoulderRight2d   = Vector.fromArray(lm2d[12]);
+    const hipLeft2d         = Vector.fromArray(lm2d[23]); // 23: Left Hip
+    const hipRight2d        = Vector.fromArray(lm2d[24]); // 24: Right Hip
+    const shoulderLeft2d    = Vector.fromArray(lm2d[11]); // 11: Left Shoulder
+    const shoulderRight2d   = Vector.fromArray(lm2d[12]); // 12: Right Shoulder
     const hipCenter2d       = hipLeft2d.lerp(hipRight2d, 1);
     const shoulderCenter2d  = shoulderLeft2d.lerp(shoulderRight2d, 1);
     const spineLength       = hipCenter2d.distance(shoulderCenter2d);
@@ -58,10 +60,10 @@ export const calcHips = (lm3d, lm2d, debug=false) => {
     hips.rotation.x = 0; //temp fix for inaccurate X axis
     if (debug) console.log("hips.rotation.z *= 1 - turnAroundAmountHips and hips.rotation.x = 0 " + turnAroundAmountHips)
 
-    const spine = Vector.rollPitchYaw(lm3d[11], lm3d[12]);
-    const rawspine = Object.assign({}, spine)
+    var spine     = Vector.rollPitchYaw(lm3d[11], lm3d[12]); // 11: Left Shoulder, Right Shoulder
+    //const spine     = {x:0, y: 0, z: 0};
+    const rawspine  = Object.assign({}, spine)
     //fix -PI, PI jumping
-    
     if (spine.y > 0.5) {
         spine.y -= 2;
         if (debug) console.log("spine.y -= 2")
@@ -79,15 +81,72 @@ export const calcHips = (lm3d, lm2d, debug=false) => {
         if (debug) console.log("spine.z = -1 - spine.z")
     }
     
-    //fix weird large numbers when 2 shoulder points get too close
-    
+    //fix weird large numbers when 2 shoulder points get too close    
     const turnAroundAmount = remap(Math.abs(spine.y), 0.2, 0.4);
     spine.z *= 1 - turnAroundAmount;
     spine.x = 0; //temp fix for inaccurate X axis
     if (debug) console.log("spine.z *= 1 - turnAroundAmount and spine.x = 0 " + turnAroundAmountHips)
-    
+
+    hips.rotation = {x: 0, y:0, z: 0};
+    spine   = {x: 0, y:0, z: 0};
+
     return rigHips(hips, spine, rawhip, rawspine);
 };
+
+function center(a,b) {
+    return Vector.fromArray({x: (a.x+b.x)/2, y: (a.y+b.y)/2, z: (a.z+b.z)/2,});
+}
+function calcHips_New(lm3d, lm2d, debug=false)  {
+    //Find 2D normalized Hip and Shoulder Joint Positions/Distances
+    const hipLeft2d         = Vector.fromArray(lm2d[23]); // 23: Left Hip
+    const hipRight2d        = Vector.fromArray(lm2d[24]); // 24: Right Hip
+    const shoulderLeft2d    = Vector.fromArray(lm2d[11]); // 11: Left Shoulder
+    const shoulderRight2d   = Vector.fromArray(lm2d[12]); // 12: Right Shoulder
+    const hipCenter2d       = center(hipLeft2d,hipRight2d);
+    const shoulderCenter2d  = center(shoulderLeft2d,shoulderRight2d);
+    //const spineLength       = hipCenter2d.distance(shoulderCenter2d);
+    const hips = {
+        position: {x: hipCenter2d.x, y: hipCenter2d.y, z: hipCenter2d.z}
+    };
+    hips.worldPosition = { x: hipCenter2d.x, y: hipCenter2d.y, z: hipCenter2d.z };
+    //hips.worldPosition.x *= hips.worldPosition.z;
+    //shoulderCenter2d.x = hipCenter2d.x;
+    //shoulderCenter2d.z = hipCenter2d.z;
+    var a = shoulderCenter2d;
+    var b = hipCenter2d;
+    var angYZ = Vector.normalizeAngle(Vector.find2DAngle(a.y, a.z, b.y, b.z));
+    var angZX = Vector.normalizeAngle(Vector.find2DAngle(a.z, a.x, b.z, b.x));
+    var angYX = Vector.normalizeAngle(Vector.find2DAngle(a.y, a.x, b.y, b.x));
+    //hips.rotation = Vector.rollPitchYaw(shoulderCenter2d, hipCenter2d);
+    hips.rotation = new Vector(angYZ, angZX, angYX);
+    console.log(lm2d);
+    console.log("angZY")
+    console.log(angYZ)
+    console.log("angZX")
+    console.log(angZX)
+    console.log("angXY")
+    console.log(angYX)
+    //console.log("hipLeft2d");
+    //console.log(hipLeft2d)
+    //console.log("hipRight2d");
+    //console.log(hipRight2d)
+    console.log("hipCenter2d");
+    console.log(hipCenter2d)
+    //console.log("shoulderLeft2d");
+    //console.log(shoulderLeft2d)
+    //console.log("shoulderRight2d");
+    //console.log(shoulderRight2d)
+    console.log("shoulderCenter2d");
+    console.log(shoulderCenter2d)
+    console.log("rotation");
+    console.log(hips.rotation)
+
+    //hips.rotation = {x: 0, y:0, z: 0.3};
+    const spine   = {x: 0, y:0, z: 0}; // 11: Left Shoulder, Right Shoulder
+    
+    return rigHips(hips, spine);
+};
+
 /**
  * Converts normalized rotations to radians and estimates world position of hips
  * @param {Object} hips : hip position and rotation values
@@ -103,16 +162,20 @@ export const rigHips = (hips, spine, rawhip, rawspine) => {
     spine.x *= PI;
     spine.y *= PI;
     spine.z *= PI;
-    rawhip.rotationAngle = {
-        x: rawhip.rotation.x * 180,
-        y: rawhip.rotation.y * 180,
-        z: rawhip.rotation.z * 180,
+    // debug
+    if (rawhip && rawspine) {
+        rawhip.rotationAngle = {
+            x: rawhip.rotation.x * 180,
+            y: rawhip.rotation.y * 180,
+            z: rawhip.rotation.z * 180,
+        }
+        rawspine.Angle = {
+            x: rawspine.x * 180,
+            y: rawspine.y * 180,
+            z: rawspine.z * 180,
+        }
     }
-    rawspine.Angle = {
-        x: rawspine.x * 180,
-        y: rawspine.y * 180,
-        z: rawspine.z * 180,
-    }
+
     return {
         Hips: hips,
         Spine: spine,

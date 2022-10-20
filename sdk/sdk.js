@@ -426,7 +426,115 @@ class araiSDK {
       */
 
     vrmSkeleton(canvas, vrm) {
+    }
+    applyQ(p, q) {
+        const nx = p.x*(q.x*q.x+q.w*q.w-q.y*q.y-q.z*q.z) + p.y*(2*q.x*q.y- 2*q.w*q.z) + p.z*( 2*q.x*q.z+ 2*q.w*q.y)
+        const ny = p.x*( 2*q.w*q.z + 2*q.x*q.y) + p.y*(q.w*q.w-q.x*q.x+q.y*q.y-q.z*q.z)+ p.z*(-2*q.w*q.x+2*q.y*q.z)
+        const nz = p.x*(-2*q.w*q.y + 2*q.x*q.z) + p.y*(2*q.w*q.x+ 2*q.y*q.z)+ p.z*(q.w*q.w-q.x*q.x-q.y*q.y+q.z*q.z)
+        return {x: nx, y: ny, z: nz};
+    }
+    drawLine = (ctx, bones, name_a, name_b) => {
+        if (bones[name_a] == null) {console.log("lack " + name_a); return}
+        if (bones[name_b] == null) {console.log("lack " + name_b); return}
+        //const a     = (name_a == "spine" && name_b == "hips")
+        //            ? this.applyQ(bones[name_a].p, bones[name_a].q)
+        //              : bones[name_a].p;
+        const a     = bones[name_a].p;
+        const b     = bones[name_b].p;
+        const width = parseInt(ctx.canvas.width);
+        const height= parseInt(ctx.canvas.height);
+        const from  = {x: Math.floor(a.x * width / 2 + 100), y: height - Math.floor(a.y * height / 2)}
+        const to    = {x: Math.floor(b.x * width / 2 + 100), y: height - Math.floor(b.y * height / 2 )}
+        ctx.moveTo( from.x,  from.y);
+        ctx.lineTo(   to.x,    to.y);
+        // console.log("draw from " + name_a + " (" + from.x + "x" + from.y + ") to " + name_b + " (" + to.x + "x" + to.y + ")")
+    }
 
+    drawBones(canvas, bones) {
+        var ctx = canvas.getContext("2d")
+        
+        //ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.save();
+        ///ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle   = "#FFFF00";
+        ctx.strokeStyle = "#FFFF00";
+        ctx.lineWidth   = 4;
+        ctx.beginPath();  
+        ctx.strokeStyle = "#FFFFFF";
+        this.drawLine(ctx, bones, "head",  "neck")
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();  
+        ctx.strokeStyle = "#FF0000";
+        this.drawLine(ctx, bones, "neck",  "chest")
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#000000";
+        this.drawLine(ctx, bones, "chest", "spine")
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#00FF00";
+        this.drawLine(ctx, bones, "spine", "hips")
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#777777";
+        this.drawLine(ctx, bones, "chest", "leftShoulder")
+        this.drawLine(ctx, bones, "chest", "rightShoulder")
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#333333"; // Low Gray => Upper ARM
+        this.drawLine(ctx, bones, "leftShoulder",  "leftUpperArm")
+        this.drawLine(ctx, bones, "rightShoulder", "rightUpperArm")
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#FFFF00";  // Red => Lower Arm
+        this.drawLine(ctx, bones, "leftUpperArm",  "leftLowerArm")
+        this.drawLine(ctx, bones, "rightUpperArm", "rightLowerArm")
+        
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#FF0000";  // Yellow => Hand
+        this.drawLine(ctx, bones, "leftLowerArm",  "leftHand")
+        this.drawLine(ctx, bones, "rightLowerArm", "rightHand")
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#FF00FF";  // Purple => hips to Upper Leg
+        this.drawLine(ctx, bones, "hips",   "leftUpperLeg")
+        this.drawLine(ctx, bones, "hips",   "rightUpperLeg")
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#0000FF";  // Blue => Upper to Lower Leg
+        this.drawLine(ctx, bones, "leftUpperLeg",  "leftLowerLeg")
+        this.drawLine(ctx, bones, "rightUpperLeg", "rightLowerLeg")
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#00FFFF";  // Magen => Lower Leg to Foot
+        this.drawLine(ctx, bones, "leftLowerLeg",  "leftFoot")
+        this.drawLine(ctx, bones, "rightLowerLeg", "rightFoot")
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.restore();
     }
     drawSkeleton(canvasElement, results) {
         let canvasCtx = canvasElement.getContext('2d');

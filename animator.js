@@ -34,7 +34,7 @@ else
     //import {GLTFLoader} from "./libs/GLTFLoader.js"
 
 var config = {
-    showTeacherVideo: true,
+    showTeacherVideo:  true,
     showTeacherAvatar: false,
 }
 var DumpMode = false;
@@ -144,6 +144,7 @@ function addGrid(scene) {
 const ashtraPath = "./assets/models/girl-Avatar-ok.vrm";
 //const ashtraPath = "./assets/models/ソーマ.vrm";
 const teacherPath = "./assets/models/ソーマ.vrm";
+//const teacherPath = "./assets/models/ash.vrm";
 //const ashtraPath = "./assets/models/Ashtra.vrm"
 //const teacherPath = "./assets/models/Ashtra.vrm"
 //const ashtraPath = "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981";
@@ -195,7 +196,7 @@ window.changeTeacher = (video_file) => {
     if (teacherVideo == null) return;
 
     var json_path = "./assets/mock-videos/";
-    var height  = (video_file == "avatar.mp4")? 1616/1080: ((video_file == "girl.mp4") ?  990/890: 720/960);
+    var height  = (video_file == "avatar.mp4")? 1616/1080: ((video_file == "girl.mp4") ?  990/890: 960/1280); // H / W
     var sclaeUp = (video_file == "avatar.mp4")? 1.4: ((video_file == "girl.mp4") ?  2: 3);
 
     teacherVideo.pause();
@@ -495,6 +496,14 @@ function playTeacherAnimator() {
         }
         
         var rig = animateVRM(teacherVrm, vrm_results);
+        /*
+        var bones = checkNodes(teacherVrm);
+        if (bones) {
+            //console.log(results);
+            //console.log(bones);
+            sdk.drawBones(teacherCanvas, bones);
+        }
+        */
     }) 
 }
 
@@ -830,7 +839,8 @@ const animateVRM = (vrm, results) => {
     //console.log("clock 1=" + delta);
     vrm.update(delta);
     
-    //checkNodes(vrm);
+    //var ret = checkNodes(vrm);
+    //console.log(ret);
     //console.log(vrm.humanoid.humanBones)
 
     return rigPos;
