@@ -199,7 +199,7 @@ export function startMindAR(video_file) {
       await mindarThree.start();
       if (! videofile) { // create techer
         const video = document.createElement("video");
-        video.crossOrigin = "anonymous";
+        //video.crossOrigin = "anonymous";
         video.id = "teacher_video";
         video.loop = true;
         video.controls = true;
