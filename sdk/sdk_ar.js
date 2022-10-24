@@ -213,11 +213,11 @@ export function startMindAR(video_file) {
         //video.height = "320px"
         document.body.appendChild(video);
         doLoad();
-        //video.play() // KILLME: Arthur, should remove
+        video.play() // KILLME: Arthur, should remove
       
         setTimeout(function() {
           //console.log("FUCK Start")
-          video.play(); // KILLME
+          //video.play(); // KILLME
         }, 5000)
       }
       renderer.setAnimationLoop(() => {
