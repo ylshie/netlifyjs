@@ -197,7 +197,7 @@ export function startMindAR(video_file) {
       }
       //} else {
       await mindarThree.start();
-      if (! videofile) {
+      if (! videofile) { // create techer
         const video = document.createElement("video");
         video.crossOrigin = "anonymous";
         video.id = "teacher_video";
@@ -213,12 +213,12 @@ export function startMindAR(video_file) {
         //video.height = "320px"
         document.body.appendChild(video);
         doLoad();
-        video.play() // KILLME: Arthur, should remove
+        //video.play() // KILLME: Arthur, should remove
       
         setTimeout(function() {
           //console.log("FUCK Start")
-          //video.play(); // KILLME
-        }, 100)
+          video.play(); // KILLME
+        }, 5000)
       }
       renderer.setAnimationLoop(() => {
         try {

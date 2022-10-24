@@ -174,6 +174,7 @@ class araiSDK {
       setTimeout(function(){
         let videoElement = document.querySelector("video");
 
+        video.crossOrigin = "anonymous";
         if (videoElement) {
           self.create_camera(videoElement)
         } else {
