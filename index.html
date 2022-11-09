@@ -3,8 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--<script src="./libs/three.js-r132/build/three.js">
     window.THREE = THREE;
-    </script>-->
-    
+    </script>--> 
     <script src="https://unpkg.com/three@0.133.0/build/three.js"></script>
     <!--     GLTF Loader for Three.js -->
     <script src="https://unpkg.com/three@0.133.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -27,6 +26,9 @@
     -->
     <!--<script src="sdk.js" type="module"></script>-->
     <script src="./animator.js" type="module"></script>
+    <script src="./testdrive.js" type="module">
+      fuck();
+    </script>
     <style>
       html, body {position: relative; margin: 0; width: 100%; height: 100%; overflow: hidden}
       #teacher_video {
@@ -55,6 +57,7 @@
       }
       #video_controls {
         position: absolute;
+        /*visibility: visible;*/
         visibility: collapse;
         bottom: 10px;
         left: 10px;
@@ -174,6 +177,17 @@
         height: 100px;
         background-color: rgb(253, 244, 76);
       }
+      #posUserVRM {
+          position: absolute;
+          visibility: hidden;
+          left: 0px;
+          top: 0px;
+          background-color: rgba(255, 255, 255, 0.5);
+      }
+      #tbUserVRM {
+          font-size: 20px;
+          border-style: solid;
+      }
       .angleinfo {
           position: absolute;
           visibility: hidden;
@@ -268,6 +282,82 @@
   <body>
     <!--<video id="teacher_video" src="./assets/mock-videos/dance.mp4"></video>-->
     <!--<video id="input_video"></video> --KILL ME-->
+    <div id="posUserVRM">
+        <table id="tbUserVRM">
+            <th>
+              <td>X</td>
+              <td>Y</td>
+              <td>Z</td>
+              <td>V</td>
+            </th>
+            <tr>
+              <td>L_Hips</td>
+              <td><label id="LH_x">0</label></td>
+              <td><label id="LH_y">0</label></td>
+              <td><label id="LH_z">0</label></td>
+              <td><label id="LH_v">0</label></td>
+              <td><label id="LH_ax">0</label></td>
+              <td><label id="LH_ay">0</label></td>
+              <td><label id="LH_az">0</label></td>
+              <td><label id="LH_ao">0</label></td>
+            </tr>
+            <tr>
+              <td>R_Hips</td>
+              <td><label id="RH_x">0</label></td>
+              <td><label id="RH_y">0</label></td>
+              <td><label id="RH_z">0</label></td>
+              <td><label id="RH_v">0</label></td>
+              <td><label id="RH_ax">0</label></td>
+              <td><label id="RH_ay">0</label></td>
+              <td><label id="RH_az">0</label></td>
+              <td><label id="RH_ao">0</label></td>
+            </tr>
+            <tr>
+              <td>L_ULeg</td>
+              <td><label id="LULeg_x">0</label></td>
+              <td><label id="LULeg_y">0</label></td>
+              <td><label id="LULeg_z">0</label></td>
+              <td><label id="LULeg_v">0</label></td>
+              <td><label id="LULeg_ax">0</label></td>
+              <td><label id="LULeg_ay">0</label></td>
+              <td><label id="LULeg_az">0</label></td>
+              <td><label id="LULeg_ao">0</label></td>
+            </tr>
+            <tr>
+              <td>R_ULeg</td>
+              <td><label id="RULeg_x">0</label></td>
+              <td><label id="RULeg_y">0</label></td>
+              <td><label id="RULeg_z">0</label></td>
+              <td><label id="RULeg_v">0</label></td>
+              <td><label id="RULeg_ax">0</label></td>
+              <td><label id="RULeg_ay">0</label></td>
+              <td><label id="RULeg_az">0</label></td>
+              <td><label id="RULeg_ao">0</label></td>
+            </tr>
+            <tr>
+              <td>L_LLeg</td>
+              <td><label id="LLLeg_x">0</label></td>
+              <td><label id="LLLeg_y">0</label></td>
+              <td><label id="LLLeg_z">0</label></td>
+              <td><label id="LLLeg_v">0</label></td>
+              <td><label id="LLLeg_ax">0</label></td>
+              <td><label id="LLLeg_ay">0</label></td>
+              <td><label id="LLLeg_az">0</label></td>
+              <td><label id="LLLeg_ao">0</label></td>
+            </tr>
+            <tr>
+              <td>R_LLeg</td>
+              <td><label id="RLLeg_x">0</label></td>
+              <td><label id="RLLeg_y">0</label></td>
+              <td><label id="RLLeg_z">0</label></td>
+              <td><label id="RLLeg_v">0</label></td>
+              <td><label id="RLLeg_ax">0</label></td>
+              <td><label id="RLLeg_ay">0</label></td>
+              <td><label id="RLLeg_az">0</label></td>
+              <td><label id="RLLeg_ao">0</label></td>
+            </tr>
+        </table>
+    </div>
     <div id="scorePanel">
         <div id="matchPanel">
             <div id="matchLeft"></div>
@@ -466,6 +556,14 @@
             <input type="radio" id="radio-5" name="teacher_switch" value="girl.mp4" />
             <label for="radio-5">5</label>
           </span>
+          <span class="switch-field">
+            <input type="radio" id="radio_teacher_0" name="teacher_option_switch" value="video" checked/>
+            <label for="radio_teacher_0">Video</label>
+            <input type="radio" id="radio_teacher_1" name="teacher_option_switch" value="avatar" />
+            <label for="radio_teacher_1">Avatar</label>
+            <input type="radio" id="radio_teacher_2" name="teacher_option_switch" value="both" />
+            <label for="radio_teacher_2">Both</label>
+          </span>
         </div>
         <div>
           <label>Layout</label>
@@ -479,6 +577,29 @@
           </span>
         </div>
         <div>
+          <label>Glasses</label>
+          <span class="switch-field">
+            <input type="radio" id="radio-1g" name="glasses_switch" value="yes"/>
+            <label for="radio-1g">Yes</label>
+            <input type="radio" id="radio-2g" name="glasses_switch" value= "no" checked/>
+            <label for="radio-2g">No</label>
+          </span>
+          <label>Hat</label>
+          <span class="switch-field">
+            <input type="radio" id="radio-1h" name="hat_switch" value="yes"/>
+            <label for="radio-1h">Yes</label>
+            <input type="radio" id="radio-2h" name="hat_switch" value= "no" checked/>
+            <label for="radio-2h">No</label>
+          </span>
+        </div>
+        <div>
+          <label>CutOut</label>
+          <span class="switch-field">
+            <input type="radio" id="radio-1x" name="cutout_switch" value="yes"/>
+            <label for="radio-1x">Yes</label>
+            <input type="radio" id="radio-2x" name="cutout_switch" value= "no" checked/>
+            <label for="radio-2x">No</label>
+          </span>
           <label>Opacity</label>
           <input id="user_opacity" type="range" min="1" max="100" value="80"/>
         </div>
@@ -487,7 +608,7 @@
           <span class="switch-field">
             <input type="radio" id="radio-threeqq" name="mirror_switch" value="yes"/>
             <label for="radio-threeqq">Yes</label>
-            <input type="radio" id="radio-fourqq" name="mirror_switch" value="no" checked/>
+            <input type="radio" id="radio-fourqq"  name="mirror_switch" value="no" checked/>
             <label for="radio-fourqq">No</label>
           </span>
           <label>Speed</label>
@@ -553,10 +674,10 @@
     };
   </script>
   <script>
-    var element = document.body;
-    var toggle  = document.querySelector("#toggle");
-    var ui          = document.querySelector("#logobutton");
-    var elmOpacity  = document.querySelector("#user_opacity");
+    var element   = document.body;
+    var toggle    = document.querySelector("#toggle");
+    var ui        = document.querySelector("#logobutton");
+    var elmOpacity= document.querySelector("#user_opacity");
     var elmSpeed  = document.querySelector("#teacherSpeed");
     var elmVC     = document.querySelector("#video_controls");
     
@@ -565,6 +686,10 @@
 
     var rad = document.myForm.layout_switch;
     var tad = document.myForm.teacher_switch;
+    var opt = document.myForm.teacher_option_switch;
+    var xad = document.myForm.cutout_switch;
+    var gad = document.myForm.glasses_switch;
+    var had = document.myForm.hat_switch;
     var prev    = null;
     var prev_1  = null;
 
@@ -579,9 +704,30 @@
         elmVC.style.visibility = "visible";
     }
     
+    window.battery = function battery(charge) {
+        if (charge > 100) charge = 100;
+
+        var aBar  = document.querySelector("#bbar");
+        var y1    = 25 + 1030 * (100 - charge) / 100;
+
+        //console.log(aBar.style.clipPath);
+        aBar.style.clipPath = "polygon(20px " + y1 + "px, 180px " + y1 + "px, 180px 1055px, 20px 1055px)"
+    }
+
     elmSpeed.onchange = (event) => {
         changeTeacherSpeed(elmSpeed.value);
     }
+
+    for (var i = 0; i < opt.length; i++) {
+        opt[i].addEventListener('change', function() {
+            console.log("change teacher option to " + this.value);
+            const showVideo  = (this.value == "video")  || (this.value == "both");
+            const showAvatar = (this.value == "avatar") || (this.value == "both");
+
+            setTeacherOption(showVideo,showAvatar)
+        });
+    }
+    //cad = document.myForm.cutout_switch;
 
     for (var i = 0; i < tad.length; i++) {
         tad[i].addEventListener('change', function() {
@@ -619,6 +765,46 @@
         });
       }
     }
+    setTimeout(function () {
+        for (var i = 0; i < xad.length; i++) {
+          xad[i].addEventListener('change', function() {
+              (prev) ? console.log(prev.value): null;
+              if (this !== prev_1) {
+                  prev = this;
+              }
+              useCutOut((this.value == "yes") ? true: false);
+              //adjustPanel();
+          });
+        }
+        gad = document.myForm.glasses_switch;
+        if (gad) {
+          for (var i = 0; i < gad.length; i++) {
+            gad[i].addEventListener('change', function() {
+                (prev_1) ? console.log(prev_1.value): null;
+                if (this !== prev_1) {
+                    prev_1 = this;
+                }
+                useGlass((this.value == "yes") ? true: false);
+                adjustPanel();
+            });
+          }
+        }
+        had = document.myForm.hat_switch;
+        if (had) {
+          for (var i = 0; i < had.length; i++) {
+            had[i].addEventListener('change', function() {
+                (prev_1) ? console.log(prev_1.value): null;
+                if (this !== prev_1) {
+                    prev_1 = this;
+                }
+                useHat((this.value == "yes") ? true: false);
+                adjustPanel();
+            });
+          }
+        }
+    }, 5000)
+    
+    
     elmOpacity.onchange = (event) => {
         console.log("opacity=" + this.value + " " + elmOpacity.value)
         setOpacity(elmOpacity.value / 100);
@@ -667,51 +853,5 @@
             }
         }
     }
-/*
-    window.battery = function battery(charge) {
-      var index = 0;
-      var list = document.querySelectorAll(".battery .bar")
-      list.forEach(
-        function(item) {
-          //console.log(item.id)
-
-          var power = Math.round(charge / 10 * 10);
-          var bar   = parseInt(item.id)
-          // console.log("bar=" + bar + " power=" + power);
-          if (bar <= power) {
-              console.log("add active")
-              item.classList.add("active");
-              index++;
-          } else {
-              item.classList.remove("active");
-          }
-      });
-    }
-*/
-    window.battery = function battery(charge) {
-        if (charge > 100) charge = 100;
-
-        var aBar  = document.querySelector("#bbar");
-        var y1    = 25 + 1030 * (100 - charge) / 100;
-
-        //console.log(aBar.style.clipPath);
-        aBar.style.clipPath = "polygon(20px " + y1 + "px, 180px " + y1 + "px, 180px 1055px, 20px 1055px)"
-    }
-
-    //polygon(20px 25px, 180px 25px, 180px 1555px, 20px 1555px);"
-    var count = 0;
-    function animRect () {
-        if (count > 10) count = 10;
-
-        var aBar  = document.querySelector("#bbar");
-        var y1    = 25 + 1030 * (10 - count) / 10;
-        
-        console.log(aBar.style.clipPath);
-        aBar.style.clipPath = "polygon(20px " + y1 + "px, 180px " + y1 + "px, 180px 1055px, 20px 1055px)"
-        count ++;
-        
-        setTimeout(animRect, 1000)
-    }
-    //animRect();
   </script>
 </html>

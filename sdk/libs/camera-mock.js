@@ -1,3 +1,5 @@
+import { GLTFLoader } from "./three/GLTFLoader";
+
 export const mockWithVideo = (path) => {
   var retVideo = null;
 
@@ -12,7 +14,9 @@ export const mockWithVideo = (path) => {
           video.oncanplay = () => {
               const startButton = document.createElement("button");
               startButton.innerHTML = "start";
-              startButton.style.position = 'fixed';
+              startButton.style.position = 'absolute';
+              startButton.style.right  = "50px"
+              startButton.style.top  = "50px"
               startButton.style.zIndex = 10000;
               document.body.appendChild(startButton);
 
@@ -68,6 +72,15 @@ export const mockWithImage = (path) => {
         resolve(video);
       });
       video.src = path;
+    });
+  }
+
+  export const loadGLTF = (path) => {
+    return new Promise((resolve, reject) => {
+      const loader = new GLTFLoader();
+      loader.load(path, (gltf) => {
+        resolve(gltf);
+      });
     });
   }
 

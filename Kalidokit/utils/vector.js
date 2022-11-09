@@ -1,4 +1,6 @@
-import { PI, TWO_PI } from "./../constants";
+//import { PI, TWO_PI } from "./../constants";
+const PI = Math.PI;
+const TWO_PI = Math.PI * 2;
 /** Vector Math class. */
 export default class Vector {
     constructor(a, b, c) {
@@ -388,7 +390,7 @@ export default class Vector {
      * @param {Vector | number} b: Vector or Number
      * @param {Vector | number} c: Vector or Number
      */
-    static angleBetween3DCoords(a, b, c) {
+    static angleBetween3DCoords(a, b, c, norm=true) {
         if (!(a instanceof Vector)) {
             a = new Vector(a);
             b = new Vector(b);
@@ -407,7 +409,11 @@ export default class Vector {
         // Extract the angle from the dot products
         const angle = Math.acos(dotProducts);
         // return single angle Normalized to 1
-        return Vector.normalizeRadians(angle);
+        if (norm) {
+            return Vector.normalizeRadians(angle);
+        } else {
+            return angle;
+        }
     }
     /**
      * Get normalized, spherical coordinates for the vector bc, relative to vector ab

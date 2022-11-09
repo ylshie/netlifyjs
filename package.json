@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "MetaWave Body AR",
   "scripts": {
-    "clean-dist": "rm -rf dist && mkdir dist && cd dist && mkdir assets",
+    "clean-dist": "rm -rf .parcel-cache && rm -rf dist && mkdir dist && cd dist && mkdir assets",
     "copy-assets": "cp -r ./assets/* ./dist/assets",
     "init": "npm run clean-dist && npm run copy-assets",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "http-server": "^14.1.1",
+    "mathjs": "^11.3.2",
     "mind-ar": "^1.1.5",
     "parcel": "^2.7.0",
     "react": "^18.2.0",

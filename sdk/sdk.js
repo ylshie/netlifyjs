@@ -43,10 +43,29 @@ const mirrorMap = [
  31, // 32: Right Foot Index
 ]
 
+const engine_options = {
+  /*
+  modelComplexity: 1,
+  smoothLandmarks: true,
+  minDetectionConfidence: 0.7,
+  minTrackingConfidence: 0.7,
+  refineFaceLandmarks: true,
+*/
+  "selfieMode": false, //true,
+  "modelComplexity": 1,
+  "smoothLandmarks": true,
+  "enableSegmentation": false, //this.config.useMask,
+  "smoothSegmentation": true,
+  "minDetectionConfidence": 0.5,
+  "minTrackingConfidence": 0.5,
+  "effect": "background"   
+}
+
 var clock_3 = new THREE.Clock();
 class araiSDK {
     config = {
         usePos: true,
+        useMask: false,
     }
     centerResult(curJson) {
       var  minX   = 10;
@@ -174,7 +193,6 @@ class araiSDK {
       setTimeout(function(){
         let videoElement = document.querySelector("video");
 
-        //video.crossOrigin = "anonymous";
         if (videoElement) {
           self.create_camera(videoElement)
         } else {
@@ -192,7 +210,7 @@ class araiSDK {
 
           // console.log("current: " + current + " pick " + key)
           var record = curJson[key];
-          var result = {};
+          var result = {time: key};
           if (record.poseLandmarks) {
             result.poseLandmarks = record.poseLandmarks;
           }
@@ -215,6 +233,19 @@ class araiSDK {
           //this.onResults(result);
           fResult(result)
           break;
+        }
+    }
+
+    setMaskOption(useMask) {
+        var opt = Object.assign({}, engine_options);
+
+        opt.enableSegmentation = useMask;
+        this.config.useMask = useMask;
+
+        if (this.config.usePos) {
+            this.pose.setOptions(opt);
+        } else {
+            this.holistic.setOptions(opt);
         }
     }
     constructor() {
@@ -267,7 +298,8 @@ class araiSDK {
             this.pose = new Pose({
               locateFile: (file) => {
                 console.log("load file " + file);
-                return `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.4/${file}`;
+                //return `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.4/${file}`;
+                return `./assets/data/${file}`;
               }
             });
         } else {
@@ -283,23 +315,6 @@ class araiSDK {
             });
         }
         
-        const engine_options = {
-            /*
-            modelComplexity: 1,
-            smoothLandmarks: true,
-            minDetectionConfidence: 0.7,
-            minTrackingConfidence: 0.7,
-            refineFaceLandmarks: true,
-          */
-            "selfieMode": true, //true,
-            "modelComplexity": 1,
-            "smoothLandmarks": true,
-            "enableSegmentation": false,
-            "smoothSegmentation": true,
-            "minDetectionConfidence": 0.5,
-            "minTrackingConfidence": 0.5,
-            "effect": "background"   
-        }
         if (this.config.usePos) {
             this.pose.setOptions(engine_options);
         } else {
@@ -537,25 +552,28 @@ class araiSDK {
 
         ctx.restore();
     }
-    drawSkeleton(canvasElement, results) {
-        let canvasCtx = canvasElement.getContext('2d');
+    drawSkeleton(elmCanvas, results) {
+        let canvasCtx = elmCanvas.getContext('2d');
         
         this.currnt_time = Date.now();
         
         canvasCtx.save();
-        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        //canvasCtx.drawImage(results.segmentationMask, 0, 0,
-        //                    canvasElement.width, canvasElement.height);
-
+        canvasCtx.clearRect(0, 0, elmCanvas.width, elmCanvas.height);
+        if (this.config.useMask && results.segmentationMask) {
+            canvasCtx.drawImage(results.segmentationMask, 0, 0, elmCanvas.width, elmCanvas.height);
+        }
         // Only overwrite existing pixels.
-        canvasCtx.globalCompositeOperation = 'source-in';
-        canvasCtx.fillStyle = '#00FF00';
-        canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
-
+        if (this.config.useMask) {
+            canvasCtx.globalCompositeOperation = 'source-in';
+            //canvasCtx.fillStyle = '#00FF00';
+            //canvasCtx.fillRect(0, 0, elmCanvas.width, elmCanvas.height);
+        } else {
+            canvasCtx.globalCompositeOperation = 'destination-atop';
+        }
         // Only overwrite missing pixels.
-        canvasCtx.globalCompositeOperation = 'destination-atop';
+        //
         if (results.image) {
-          canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+            canvasCtx.drawImage(results.image, 0, 0, elmCanvas.width, elmCanvas.height);
         }
         canvasCtx.globalCompositeOperation = 'source-over';
           drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,

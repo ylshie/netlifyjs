@@ -2,8 +2,16 @@ import { RestingDefault } from "../utils/helpers";
 import { calcArms } from "./calcArms";
 import { calcHips } from "./calcHips";
 import { calcLegs } from "./calcLegs";
+import { changeFake, fakeU, fakeL } from "./testdata";
+
 /** Class representing pose solver. */
 export class PoseSolver {
+    static fakePose(data) {
+        changeFake(data,data);
+    }
+    static currentFake() {
+        return {u: fakeU, l: fakeL}
+    }
     /**
      * Combines arm, hips, and leg calcs into one method
      * @param {Array} lm3d : array of 3D pose vectors from tfjs or mediapipe
@@ -11,7 +19,12 @@ export class PoseSolver {
      * @param {String} runtime: set as either "tfjs" or "mediapipe"
      * @param {IPoseSolveOptions} options: options object
      */
-    static solve(lm3d, lm2d, { runtime = "mediapipe", video = null, imageSize = null, enableLegs = true, debug = false } = {}) {
+    static solve(lm3d, lm2d, ref, { runtime = "mediapipe", 
+                                    video   = null, 
+                                    imageSize = null, 
+                                    enableLegs = true, 
+                                    debug   = false,
+                                    newver  = false } = {}) {
         var _a, _b, _c, _d;
         if (!lm3d && !lm2d) {
             console.error("Need both World Pose and Pose Landmarks");
@@ -21,7 +34,7 @@ export class PoseSolver {
         if (video) {
             const videoEl = (typeof video === "string" ? document.querySelector(video) : video);
             imageSize = {
-                width: videoEl.videoWidth,
+                width:  videoEl.videoWidth,
                 height: videoEl.videoHeight,
             };
         }
@@ -38,12 +51,18 @@ export class PoseSolver {
         }
         const Arms = calcArms(lm3d);
         const Hips = calcHips(lm3d, lm2d, debug);
-        const Legs = enableLegs ? calcLegs(lm3d, debug) : null;
+        const Legs = enableLegs ? calcLegs(lm3d, ref, debug) : null;
         //DETECT OFFSCREEN AND RESET VALUES TO DEFAULTS
-        const rightHandOffscreen = lm3d[15].y > 0.1 || ((_a = lm3d[15].visibility) !== null && _a !== void 0 ? _a : 0) < 0.23 || 0.995 < lm2d[15].y;
-        const leftHandOffscreen  = lm3d[16].y > 0.1 || ((_b = lm3d[16].visibility) !== null && _b !== void 0 ? _b : 0) < 0.23 || 0.995 < lm2d[16].y;
-        const leftFootOffscreen  = lm3d[23].y > 0.1 || ((_c = lm3d[23].visibility) !== null && _c !== void 0 ? _c : 0) < 0.63 || Hips.Hips.position.z > -0.4;
-        const rightFootOffscreen = lm3d[24].y > 0.1 || ((_d = lm3d[24].visibility) !== null && _d !== void 0 ? _d : 0) < 0.63 || Hips.Hips.position.z > -0.4;
+        //const rightHandOffscreen = lm3d[15].y > 0.1 || ((_a = lm3d[15].visibility) !== null && _a !== void 0 ? _a : 0) < 0.23 || 0.995 < lm2d[15].y;
+        //const leftHandOffscreen  = lm3d[16].y > 0.1 || ((_b = lm3d[16].visibility) !== null && _b !== void 0 ? _b : 0) < 0.23 || 0.995 < lm2d[16].y;
+        //const leftFootOffscreen  = lm3d[23].y > 0.1 || ((_c = lm3d[23].visibility) !== null && _c !== void 0 ? _c : 0) < 0.63 || Hips.Hips.position.z > -0.4;
+        //const rightFootOffscreen = lm3d[24].y > 0.1 || ((_d = lm3d[24].visibility) !== null && _d !== void 0 ? _d : 0) < 0.63 || Hips.Hips.position.z > -0.4;
+        const leftHipOffscreen   = ((_a = lm3d[23].visibility) !== null && _a !== void 0 ? _a : 0) < 0.23;
+        const rightHipOffscreen  = ((_a = lm3d[24].visibility) !== null && _a !== void 0 ? _a : 0) < 0.23;
+        const rightHandOffscreen = ((_a = lm3d[15].visibility) !== null && _a !== void 0 ? _a : 0) < 0.23;
+        const leftHandOffscreen  = ((_b = lm3d[16].visibility) !== null && _b !== void 0 ? _b : 0) < 0.23;
+        const leftFootOffscreen  = ((_c = lm3d[25].visibility) !== null && _c !== void 0 ? _c : 0) < 0.63;
+        const rightFootOffscreen = ((_d = lm3d[26].visibility) !== null && _d !== void 0 ? _d : 0) < 0.63;
         Arms.UpperArm.l     = Arms.UpperArm.l.multiply(leftHandOffscreen ? 0 : 1);
         Arms.UpperArm.l.z   = leftHandOffscreen ? RestingDefault.Pose.LeftUpperArm.z : Arms.UpperArm.l.z;
         Arms.UpperArm.r     = Arms.UpperArm.r.multiply(rightHandOffscreen ? 0 : 1);
@@ -52,12 +71,27 @@ export class PoseSolver {
         Arms.LowerArm.r     = Arms.LowerArm.r.multiply(rightHandOffscreen ? 0 : 1);
         Arms.Hand.l = Arms.Hand.l.multiply(leftHandOffscreen ? 0 : 1);
         Arms.Hand.r = Arms.Hand.r.multiply(rightHandOffscreen ? 0 : 1);
+        if (leftHipOffscreen && rightHipOffscreen) {
+            Hips.Hips.rotation = Hips.Hips.rotation.multiply(0);
+            Hips.Spine = Hips.Spine.multiply(0);
+            Hips.Hips.rotation.o = true;
+            Hips.Spine.o = true;
+        } else {
+            Hips.Hips.rotation.o = false;
+            Hips.Spine.o = false;
+        }
         //skip calculations if disable legs
         if (Legs) {
+            ///* KILLME
+            Legs.UpperLeg.l.o = rightFootOffscreen;
+            Legs.UpperLeg.r.o = leftFootOffscreen;
+            Legs.LowerLeg.l.o = rightFootOffscreen;
+            Legs.LowerLeg.r.o = leftFootOffscreen;
             Legs.UpperLeg.l = Legs.UpperLeg.l.multiply(rightFootOffscreen ? 0 : 1);
             Legs.UpperLeg.r = Legs.UpperLeg.r.multiply(leftFootOffscreen  ? 0 : 1);
             Legs.LowerLeg.l = Legs.LowerLeg.l.multiply(rightFootOffscreen ? 0 : 1);
             Legs.LowerLeg.r = Legs.LowerLeg.r.multiply(leftFootOffscreen  ? 0 : 1);
+            //*/
         }
         var debugInfo = null;
         if (Legs.mp || Legs.calc) {

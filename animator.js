@@ -2,9 +2,12 @@ import * as Kalidokit from "./Kalidokit"
 import * as xxx from "./sdk/build/araisdk.prod"
 //import * as xxx from "./sdk/build/araisdk.dm"
 //import {currentVrm, updateVRM, loadVRM, setVRM}from "./vrmlib"
-import {checkNodes, updateVRM, loadVRM}from "./vrmlib"
+import {checkNodes, updateVRM, loadVRM, addChildItem}from "./vrmlib"
 //import {loadVideo} from './sdk/libs/camera-mock.js';
 import {createChromaMaterial} from './sdk/libs/chroma-video.js';
+import {loadGLTF} from "./sdk/libs/camera-mock.js"
+import { sqrt } from "mathjs";
+
 
 const url = new URL(window.location);
 let detect = url.searchParams.get('video'); // => 'hello'
@@ -34,10 +37,17 @@ else
     //import {GLTFLoader} from "./libs/GLTFLoader.js"
 
 var config = {
-    showTeacherVideo:  true,
-    showTeacherAvatar: false,
+    showTeacherVideo:   true,
+    showTeacherAvatar:  false,
+    showTeacherSkeleton: false,
+    playAtStart: true,
+    showGlass: false,
+    showHat: false,
 }
 var DumpMode = false;
+
+var teacherVideo = null;
+var teacherPlane = null;
 
 //let x = xxx;
 /* THREEJS WORLD SETUP */
@@ -45,9 +55,17 @@ var DumpMode = false;
 //var domAnimator = null;
 
 // renderer
+const rendererVideo = new THREE.WebGLRenderer({ alpha: true });
+rendererVideo.setSize(window.innerWidth, window.innerWidth);
+rendererVideo.setPixelRatio(window.devicePixelRatio);
+document.body.appendChild(rendererVideo.domElement);
+var globalPlane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0.3 );
+
+rendererVideo.clippingPlanes = [ globalPlane ];
+
 const rendererUser = new THREE.WebGLRenderer({ alpha: true });
-const init_width = window.innerWidth / 3;
-const init_height = window.innerHeight / 2;
+const init_width    = window.innerWidth / 3;
+const init_height   = window.innerHeight / 2;
 rendererUser.setSize(init_width, init_height);
 rendererUser.setPixelRatio(window.devicePixelRatio);
 //domAnimator = renderer.domElement;
@@ -58,20 +76,24 @@ rendererUser.domElement.style.top = window.innerHeight / 2;
 document.body.appendChild(rendererUser.domElement);
 
 const rendererTeacher = new THREE.WebGLRenderer({ alpha: true });
-const init_width_2 = window.innerWidth;
+const init_width_2  = window.innerWidth / 2;
 const init_height_2 = window.innerHeight;
 rendererTeacher.setSize(init_width_2, init_height_2);
 rendererTeacher.setPixelRatio(window.devicePixelRatio);
 //domAnimator = renderer.domElement;
 rendererTeacher.domElement.style.position = "absolute"
-rendererTeacher.domElement.style.left = 0;
+rendererTeacher.domElement.style.left = window.innerWidth / 2;
 rendererTeacher.domElement.style.top = 0;
 
 document.body.appendChild(rendererTeacher.domElement);
 
 // camera
+//const cameraVideo = new THREE.PerspectiveCamera(90, init_width / init_height, 0.1, 1000);
+const cameraVideo = new THREE.OrthographicCamera(-1, 1, 1, -1 , 0.1, 1000);
+cameraVideo.position.set(0.0, 0.0, 1.0);
+
 const orbitCameraUser = new THREE.PerspectiveCamera(35, init_width / init_height, 0.1, 1000);
-orbitCameraUser.position.set(0.0, 1.0, 4.0);
+orbitCameraUser.position.set(0.0, 1.0, 3.5);
 //orbitCamera.position.set(0.0, 1.4, 0.7);
 
 const orbitCameraTeacher = new THREE.PerspectiveCamera(35, init_width_2 / init_height_2, 0.1, 1000);
@@ -87,10 +109,15 @@ orbitControls.target.set(0.0, 1.0, 0.0);
 orbitControls.update();
 
 // scene
-const sceneUser = new THREE.Scene();
-const sceneTeacher = new THREE.Scene();
+const sceneVideo    = new THREE.Scene();
+const sceneUser     = new THREE.Scene();
+const sceneTeacher  = new THREE.Scene();
 
 // light
+const lightVideo = new THREE.DirectionalLight(0xffffff);
+lightVideo.position.set(1.0, 1.0, 1.0).normalize();
+sceneVideo.add(lightVideo);
+
 const lightUser = new THREE.DirectionalLight(0xffffff);
 lightUser.position.set(1.0, 1.0, 1.0).normalize();
 sceneUser.add(lightUser);
@@ -106,6 +133,14 @@ const clock_2 = new THREE.Clock();
 let userVrm;
 let teacherVrm;
 
+function setTeacherOption(showVideo,showAvatar,showSkeleton=false) {
+    config.showTeacherVideo     = showVideo;
+    config.showTeacherAvatar    = showAvatar;
+    config.showTeacherSkeleton  = showSkeleton;
+
+    teacherPlane.visible        = config.showTeacherVideo;
+    teacherVrm.scene.visible    = config.showTeacherAvatar;
+}
 function animate() {
     requestAnimationFrame(animate);
     /*
@@ -142,15 +177,70 @@ function addGrid(scene) {
 /* VRM CHARACTER SETUP */
 
 const ashtraPath = "./assets/models/girl-Avatar-ok.vrm";
+//const ashtraPath = "./assets/models/ダクネス.vrm";
 //const ashtraPath = "./assets/models/ソーマ.vrm";
-const teacherPath = "./assets/models/ソーマ.vrm";
+//const teacherPath = "./assets/models/ソーマ.vrm";
+const teacherPath = "./assets/models/ダクネス.vrm";
+//const teacherPath = "./assets/models/Power.vrm";
 //const teacherPath = "./assets/models/ash.vrm";
 //const ashtraPath = "./assets/models/Ashtra.vrm"
 //const teacherPath = "./assets/models/Ashtra.vrm"
 //const ashtraPath = "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981";
 //const teacherPath = "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981";
-
+/*
+loadVRM(sceneVideo, './assets/models/glasses2/scene.gltf', (vrm) => {
+    //vrm.scene.position.x     = -0.5;
+    //cameraVideo.position.x   = 0;
+})
+*/
 //addGrid(sceneUser)
+function get2DAngle(cx, cy, ex, ey) {
+    const dy = ey - cy;
+    const dx = ex - cx;
+    const theta = Math.atan2(dy, dx);
+    return theta;
+}
+
+function calcRotate(a, b, left=true)
+{
+    var s = (left)? 1: -1;
+    var y = s * get2DAngle(s * a.x,a.z,s * b.x,b.z); 
+    
+    var dx= Math.abs(b.x-a.x);
+    var dz= Math.abs(b.z-a.z);
+    var r = Math.sqrt(dx*dx+dz*dz);
+    var d = (b.x>a.x) ? r: -r 
+    var z = s * get2DAngle(0,a.y,s * d,b.y) //var z = get2DAngle(a.x,a.y,b.x,b.y)
+    var x = 0;
+    
+    if (a.x == b.x && a.y != b.y && a.z != b.z) {
+        x = (b.z>a.z) ? get2DAngle(a.z,a.y,b.z,b.y): get2DAngle(b.z,b.y,a.z,a.y);
+        y = (b.z>a.z) ? Math.abs(y): -Math.abs(y)
+        z = 0;
+    }
+    
+    if (z >  Math.PI/2) y = 0;
+    if (z < -Math.PI/2) y = 0;
+
+    if (left) {
+        if (y < -Math.PI/2) z = 0;
+    } else {     
+        if (y >  Math.PI/2) z = 0;
+    }
+
+    return {x:x, y:y, z:z};
+}
+
+async function wearGlass(vrm) {
+    const glasses2 = await loadGLTF('./assets/models/glasses2/scene.gltf');
+    glasses2.scene.rotation.set(0, 0, 0);
+    glasses2.scene.position.set(0, 0, 0);
+    glasses2.scene.scale.set(0.1, 0.1, 0.1);
+
+    //vrm.scene.add(glasses2.scene);
+    addChildItem(vrm, "Head", glasses2.scene);
+}
+
 loadVRM(sceneUser, ashtraPath, (vrm) => {
     //vrm.scene.position.x = (detect)? -0.8: 0.5;
     if (screen.width > screen.height) {
@@ -160,16 +250,53 @@ loadVRM(sceneUser, ashtraPath, (vrm) => {
     }
     
     userVrm = vrm 
+
+    //wearGlass(userVrm);
 })
 ///*
+var vrmGlass= new THREE.Object3D;
+var vrmHat  = new THREE.Object3D;
+const modelGlass= './assets/models/glasses2/scene.gltf'
+const modelHat  = './assets/models/hat2/scene.gltf'
+async function loadGlasss() {
+    const glasses2 = await loadGLTF(modelGlass);
+    glasses2.scene.rotation.set( 0, -Math.PI/2, 0);
+    glasses2.scene.position.set(0, 0, 0);
+    glasses2.scene.scale.set(1, 1, 1);
+    glasses2.scene.renderOrder = 1;
+    //glasses2.scene.visible = config.showGlass;
 
-if (config.showTeacherAvatar) {
-    loadVRM(sceneTeacher, teacherPath, (vrm) => {
-        vrm.scene.position.x = 0.5;
-        teacherVrm = vrm;
-        animate();
-    })
+    vrmGlass.add(glasses2.scene);
+    vrmGlass.visible = config.showGlass;
+    sceneVideo.add(vrmGlass);
 }
+async function loadHat() {
+    const model = await loadGLTF(modelHat);
+    model.scene.rotation.set( 0, 0, 0);
+    model.scene.position.set(0, 5, 0);
+    model.scene.scale.set(1, 1, 1);
+    model.scene.renderOrder = 1;
+    //model.scene.visible = config.showHat;
+
+    vrmHat.add(model.scene);
+    vrmHat.visible = config.showHat;
+    sceneVideo.add(vrmHat);
+}
+
+loadGlasss();
+loadHat();
+
+loadVRM(sceneTeacher, teacherPath, (vrm) => {
+    teacherVrm = vrm;
+
+    teacherVrm.scene.visible        = config.showTeacherAvatar;
+    teacherVrm.scene.position.x     = -0.3;
+    teacherVrm.scene.position.y     = 0.1;
+    orbitCameraTeacher.position.x   = 0;
+    
+    animate();
+})
+
 //*/
 /*
 if (! detect) {
@@ -189,8 +316,7 @@ const sizeMap = {
     "tk_1.mp4": 720/960,
 }
 */
-var teacherVideo = null;
-var teacherPlane = null;
+
 window.changeTeacher = (video_file) => {
     if (sdk.loadVideoSkeleton == null) return;
     if (teacherVideo == null) return;
@@ -218,20 +344,22 @@ window.changeTeacher = (video_file) => {
     var elmUser = rendererUser.domElement;
 
     if (video_file == "girl.mp4") {
-        elmSK.style.visibility  = "hidden";
-        elmVRM.style.visibility = "hidden";
-        elmUser.style.visibility = "hidden";
+        elmSK.style.visibility      = "hidden";
+        elmVRM.style.visibility     = "hidden";
+        elmUser.style.visibility    = "hidden";
     } else {
-        elmSK.style.visibility  = "visible";
-        elmVRM.style.visibility = "visible";
-        elmUser.style.visibility = "visible";
+        elmSK.style.visibility      = "visible";
+        elmVRM.style.visibility     = "visible";
+        elmUser.style.visibility    = "visible";
     }
 
     sdk.loadVideoSkeleton(json_path,(json) => {
         teacherSkeleton = json;
         sdk.centerResult(teacherSkeleton);
 
-        teacherVideo.play();
+        if (config.playAtStart) {
+            teacherVideo.play();
+        }
     });
 }
 
@@ -264,13 +392,15 @@ async function addTeacherVideo(scene) {
     const material = createChromaMaterial(texture, 0x00ff00);
     const plane = new THREE.Mesh(geometry, material);
     //plane.rotation.x = Math.PI/2;
-    plane.position.x = 0.6; //0.6;
+    plane.position.x = 0.5; //0.6;
     plane.position.y = 1.0;
     plane.scale.multiplyScalar(1.4)
     
     teacherPlane = plane;
 
-    if (config.showTeacherVideo) {
+    //if (config.showTeacherVideo) 
+    {
+        plane.visible = config.showTeacherVideo;
         scene.add(plane);
     }
     
@@ -457,11 +587,12 @@ window.changeTeacherSpeed = (speed) => {
     if (null == teacherVideo) return;
 
     teacherVideo.playbackRate = speed;
-}
+};
 
 var score_teacher_left = null;
 var score_teacher_right = null;
 
+var teacherData = {};
 function playTeacherAnimator() {
     //var videoElement = document.querySelector("#teacher_video");
     var videoElement = teacherVideo;
@@ -481,7 +612,7 @@ function playTeacherAnimator() {
         score_teacher_right = playRightHand(vrm_results, teacher_right)
         let teacherCanvas = document.querySelector('#teacherCanvas');
 
-        if (teacherCanvas && teacherVideo) {
+        if (teacherCanvas && teacherVideo) { 
             if (teacherVideo.videoWidth > 1000) {
                 teacherCanvas.style.width  = teacherVideo.videoWidth / 4;
                 teacherCanvas.style.height = teacherVideo.videoHeight / 4;
@@ -489,21 +620,20 @@ function playTeacherAnimator() {
                 teacherCanvas.style.width  = teacherVideo.videoWidth / 2;
                 teacherCanvas.style.height = teacherVideo.videoHeight / 2;
             }
-            
-            sdk.drawSkeleton(teacherCanvas, sk_results);
+            //console.log(sk_results);
+            //sdk.drawSkeleton(teacherCanvas, sk_results);
+            sdk.drawSkeleton(teacherCanvas, vrm_results);
         } else {
             console.log("canvase or video is null, fail to play teacher skeleton")
         }
         
-        var rig = animateVRM(teacherVrm, vrm_results);
-        /*
-        var bones = checkNodes(teacherVrm);
-        if (bones) {
-            //console.log(results);
-            //console.log(bones);
-            sdk.drawBones(teacherCanvas, bones);
+        animateVRM(teacherVrm, vrm_results, teacherData);
+        if (config.showTeacherSkeleton) {
+            var bones = checkNodes(teacherVrm);
+            if (bones) { //console.log(bones); //console.log(results);
+                sdk.drawBones(teacherCanvas, bones);
+            }
         }
-        */
     }) 
 }
 
@@ -549,6 +679,44 @@ function countScore(userScore, teacherScore) {
     return scoreMap[teacher][user];
 }
 
+//  0: Nose same
+//  1: Left Eye Inner
+//  2: Left Eye
+//  3: Left Eye Outer
+//  4: Right Eye Inner
+//  5: Right Eye
+//  6: Right Eye Outer
+//  7: Left Ear
+//  8: Right Ear
+function updateWear(results, wear, ratio, visible, shift=0) {
+    if (! vrmGlass) return;
+    if (! results) return;
+    if (! results.poseLandmarks) return;
+
+    var helper = new THREE.BoxHelper(wear, 0xff0000);
+    helper.update();
+    helper.geometry.computeBoundingBox()
+    const lm    = results.poseLandmarks;
+    const max   = helper.geometry.boundingBox.max;
+    const min   = helper.geometry.boundingBox.min;
+    const n     = lm[0];
+    const lEar  = lm[7];
+    const rEar  = lm[8];
+    const wlen  = sqrt((max.x - min.x)*(max.x - min.x)+(max.y - min.y)*(max.y - min.y));
+    const flen  = ratio * sqrt((lEar.x - rEar.x)*(lEar.x - rEar.x)+(lEar.y - rEar.y)*(lEar.y - rEar.y));
+    const scale = Math.abs(wear.scale.x * flen / wlen);
+    const angle = calcRotate(rEar,lEar);
+    const show  = visible && (lEar.visibility > 0.3 && rEar.visibility > 0.3) && (lEar.y < 0.95) && (rEar.y < 0.95)
+    
+    const x = n.x - 0.5;
+    const y = 0.5 - n.y;
+    wear.position.set(2 * x, 2.1 * (y + shift), 0);
+    wear.rotation.set( 0 , 0 ,-angle.z);
+    wear.scale.set(scale,scale,scale);
+    wear.visible = show;
+}
+
+var userData = {};
 var curScore = 0;
 var pre_user_left   = -1;
 var pre_user_right  = -1;
@@ -558,14 +726,16 @@ sdk.onCallback = (results) => {
     //return; // KILLME
     //console.log("enter callack");
     adjustPanel();
+    updateWear(results, vrmGlass, 3, config.showGlass);
+    updateWear(results, vrmHat,   5, config.showHat, 0.15);
 
     playTeacherVideo();
     
     var vrm_results = sdk.mirrorResults(results)
     if (detect) {
-        animateVRM(teacherVrm, vrm_results);
+        animateVRM(teacherVrm, vrm_results,userData);
     } else {
-        animateVRM(userVrm, vrm_results);
+        animateVRM(userVrm, vrm_results,userData);
     }
     var score_user_left  = playLeftHand(vrm_results, user_left, user_angle_left)
     var score_user_right = playRightHand(vrm_results, user_right, user_angle_right)
@@ -617,7 +787,9 @@ sdk.onCallback = (results) => {
     playTeacherAnimator()
     rendererUser.render(sceneUser, orbitCameraUser);
     rendererTeacher.render(sceneTeacher, orbitCameraTeacher);
+    rendererVideo.render(sceneVideo, cameraVideo);
 }
+
 function adjustUserVideo(elm) {
     let video = findMindARVideo();
 
@@ -646,7 +818,10 @@ function adjustUserVideo(elm) {
     elm.style.top       = posTop;
     elm.style.width     = targetWidth;
     elm.style.height    = targetHeight
+
+    return {left: posLeft, top: posTop, width: targetWidth, height: targetHeight}
 }
+/*
 function adjustPos(elm, pos)  {
     let video = findMindARVideo();
 
@@ -671,7 +846,7 @@ function adjustPos(elm, pos)  {
         elm.style.height    = targetHeight; //window.innerHeight * 0.9//video.videoHeight ; //"480px"; //"240px";
     }
 }
-
+*/
 function findMindARVideo() {
     let elmList = document.querySelectorAll("video");
     let elm = null;
@@ -688,13 +863,13 @@ function findMindARVideo() {
 function adjustUserAvatar(rendererUser, orbitCameraUser) {
     var posLeft = 0;
     var posTop  = window.innerHeight / 2;
-    var targetWidth = window.innerWidth;    //window.innerWidth / 3;
+    var targetWidth  = window.innerWidth / 2;    //window.innerWidth / 3;
     var targetHeight = window.innerHeight / 2
 
     if ((layout == "ar") || (layout == "a")) {
         posTop = 0;
-        targetHeight = window.innerHeight;
-        targetWidth = window.innerWidth;   //window.innerWidth / 2;
+        targetHeight    = window.innerHeight;
+        targetWidth     = window.innerWidth / 2;   //window.innerWidth / 2;
     }
     rendererUser.domElement.style.left  = posLeft
     rendererUser.domElement.style.top   = posTop;
@@ -703,8 +878,10 @@ function adjustUserAvatar(rendererUser, orbitCameraUser) {
     if (userVrm) {
         if (screen.width > screen.height) {
             userVrm.scene.position.x = -2;
+            orbitCameraUser.position.x = -2;
         } else {
-            userVrm.scene.position.x = -0.5;
+            userVrm.scene.position.x    =    0;
+            orbitCameraUser.position.x  = -0.2;
         }
     }
     
@@ -721,6 +898,18 @@ function setOpacity(newValue) {
 function setMirror(newValue) {
     mirror = newValue;
 }
+
+function useGlass(use) {
+    config.showGlass = use;
+};
+function useHat(use) {
+    config.showHat = use;
+};
+function useCutOut(use) {
+   sdk.setMaskOption(use);
+};
+
+//const rendererVideo = new THREE.WebGLRenderer({ alpha: true });
 function adjustPanel() {
     //let videoElement = document.querySelector("video");
     let videoElement    = findMindARVideo();
@@ -732,29 +921,48 @@ function adjustPanel() {
     videoCanvas.style.opacity = parseFloat(opacity);
     adjustUserVideo(videoElement);
     adjustUserVideo(videoCanvas);
+    var info = adjustUserVideo(rendererVideo.domElement);
+    rendererVideo.setSize(info.width,info.height);
+    cameraVideo.aspect  = info.width / info.height;
+    cameraVideo.updateProjectionMatrix();
+
     //adjustUserVideo(videoControls);
     
     adjustUserAvatar(rendererUser, orbitCameraUser)
-    rendererTeacher.domElement.style.left = 0;
-    rendererTeacher.domElement.style.top = 0;
     
+    const teacherLeft   = window.innerWidth / 2;
+    const teacherWidth  = window.innerWidth / 2;
+    const teacherHeight = window.innerHeight;
     //rendererUser.setSize(window.innerWidth / 3, window.innerHeight / 2);
-    rendererTeacher.setSize(window.innerWidth, window.innerHeight)
+    rendererTeacher.domElement.style.left   = teacherLeft;
+    rendererTeacher.domElement.style.top    = 0;
+    rendererTeacher.setSize(teacherWidth, teacherHeight)
 
     //orbitCameraUser.aspect      = (window.innerWidth / 3) / (window.innerHeight / 2);
-    orbitCameraTeacher.aspect   = window.innerWidth / window.innerHeight;
+    orbitCameraTeacher.aspect   = teacherWidth / teacherHeight;
     //orbitCameraUser.updateProjectionMatrix();
     orbitCameraTeacher.updateProjectionMatrix();
 }
 
+window.setTeacherOption = setTeacherOption;
 window.setLayout = setLayout;
 window.adjustPanel = adjustPanel;
 window.setOpacity = setOpacity;
 window.setMirror = setMirror;
 window.bindVideoControl = bindVideoControl;
+window.useGlass = useGlass;
+window.useHat = useHat;
+window.useCutOut = useCutOut;
 
 function bindVideoControl(type, elm) {
     var video = sdk.sourceVideo();
+
+    if (detect) {
+        video = sdk.sourceVideo();
+    } else {
+        var elmVideo = document.querySelector("#teacher_video");
+        video = teacherVideo;
+    }
 
     if (type == "play") {
         console.log("bind play " + elm)
@@ -814,7 +1022,8 @@ var elmDump  = document.querySelector("#btnDump");
 
 sdk.onFirst = () => {
     //return;
-    if (detect) {
+    //if (detect) 
+    {
         bindVideoControl("play",  elmPlay)
         bindVideoControl("time",  elmTime)
         bindVideoControl("range", elmRange)
@@ -826,13 +1035,13 @@ sdk.onFirst = () => {
 
 
 /* VRM Character Animator */
-const animateVRM = (vrm, results) => {
+const animateVRM = (vrm, results, data) => {
     if (null == vrm) return null;
 
     //let videoElement = document.querySelector("video");
     let videoElement = findMindARVideo();
 
-    var rigPos = updateVRM(vrm, videoElement, results, DumpMode);
+    var rigPos = updateVRM(vrm, videoElement, results, data, DumpMode);
     if (DumpMode) DumpMode = !DumpMode; // Keep One Stop Dump
     // Update model to render physics
     var delta = clock_1.getDelta();
