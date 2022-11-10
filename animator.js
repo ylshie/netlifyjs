@@ -180,7 +180,7 @@ const ashtraPath = "./assets/models/girl-Avatar-ok.vrm";
 //const ashtraPath = "./assets/models/ダクネス.vrm";
 //const ashtraPath = "./assets/models/ソーマ.vrm";
 //const teacherPath = "./assets/models/ソーマ.vrm";
-const teacherPath = "./assets/models/darkness.vrm" // "ダクネス.vrm";
+const teacherPath = "./assets/models/darkness.vrm";
 //const teacherPath = "./assets/models/Power.vrm";
 //const teacherPath = "./assets/models/ash.vrm";
 //const ashtraPath = "./assets/models/Ashtra.vrm"
@@ -272,7 +272,7 @@ async function loadGlasss() {
 }
 async function loadHat() {
     const model = await loadGLTF(modelHat);
-    model.scene.rotation.set( 0, 0, 0);
+    model.scene.rotation.set( 0.3, 0, 0);
     model.scene.position.set(0, 5, 0);
     model.scene.scale.set(1, 1, 1);
     model.scene.renderOrder = 1;
@@ -688,7 +688,7 @@ function countScore(userScore, teacherScore) {
 //  6: Right Eye Outer
 //  7: Left Ear
 //  8: Right Ear
-function updateWear(results, wear, ratio, visible, shift=0) {
+function updateWear(results, wear, ratio, visible, shift={x:0,y:0,z:0}) {
     if (! vrmGlass) return;
     if (! results) return;
     if (! results.poseLandmarks) return;
@@ -708,9 +708,10 @@ function updateWear(results, wear, ratio, visible, shift=0) {
     const angle = calcRotate(rEar,lEar);
     const show  = visible && (lEar.visibility > 0.3 && rEar.visibility > 0.3) && (lEar.y < 0.95) && (rEar.y < 0.95)
     
-    const x = n.x - 0.5;
-    const y = 0.5 - n.y;
-    wear.position.set(2 * x, 2.1 * (y + shift), 0);
+    const x = n.x - 0.5 + shift.x;
+    const y = 0.5 - n.y + shift.y;
+    const z = shift.z;
+    wear.position.set(2 * x, 2.1 * y, 2 * z);
     wear.rotation.set( 0 , 0 ,-angle.z);
     wear.scale.set(scale,scale,scale);
     wear.visible = show;
@@ -727,7 +728,7 @@ sdk.onCallback = (results) => {
     //console.log("enter callack");
     adjustPanel();
     updateWear(results, vrmGlass, 3, config.showGlass);
-    updateWear(results, vrmHat,   5, config.showHat, 0.15);
+    updateWear(results, vrmHat,   6, config.showHat, {x: 0, y:0.1, z: -0.2});
 
     playTeacherVideo();
     
