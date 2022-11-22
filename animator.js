@@ -612,6 +612,12 @@ function playTeacherAnimator() {
         score_teacher_right = playRightHand(vrm_results, teacher_right)
         let teacherCanvas = document.querySelector('#teacherCanvas');
 
+        if (layout == "n") {
+            teacherCanvas.style.left = "35%";
+        } else {
+            teacherCanvas.style.left = "70%";
+        }
+
         if (teacherCanvas && teacherVideo) { 
             if (teacherVideo.videoWidth > 1000) {
                 teacherCanvas.style.width  = teacherVideo.videoWidth / 4;
@@ -808,7 +814,8 @@ function adjustUserVideo(elm) {
         posLeft = (winWidth / 2 - targetWidth) / 2;
         posTop = winHeight / 2;
     }
-    if (layout == "a") {
+
+    if (layout == "a" || layout == "n") {
         elm.style.visibility = "hidden";
     } else {
         if (elm != video) elm.style.visibility = "visible";
@@ -876,6 +883,11 @@ function adjustUserAvatar(rendererUser, orbitCameraUser) {
     rendererUser.domElement.style.top   = posTop;
     rendererUser.setSize(targetWidth, targetHeight);
 
+    if (layout == "n") {
+        rendererUser.domElement.style.visibility = "hidden";
+    } else {
+        rendererUser.domElement.style.visibility = "visible";
+    }
     if (userVrm) {
         if (screen.width > screen.height) {
             userVrm.scene.position.x = -2;
@@ -931,7 +943,7 @@ function adjustPanel() {
     
     adjustUserAvatar(rendererUser, orbitCameraUser)
     
-    const teacherLeft   = window.innerWidth / 2;
+    const teacherLeft   = (layout == "n") ? window.innerWidth / 6: window.innerWidth / 2;
     const teacherWidth  = window.innerWidth / 2;
     const teacherHeight = window.innerHeight;
     //rendererUser.setSize(window.innerWidth / 3, window.innerHeight / 2);
