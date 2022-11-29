@@ -533,7 +533,7 @@
     </a>
     <canvas class="output_canvas" width="1000px" height="720px" left="0px"></canvas>
     <canvas id="video_canvas" width="600px" height="400px"></canvas>
-    <canvas id="teacherCanvas" width="600px" height="400px"></canvas>
+    <canvas id="teacherCanvas" width="900px" height="600px"></canvas>
 
     <div id="logobutton">
       <img src="./setting.svg" width="32px" height="32px"/>
@@ -576,6 +576,13 @@
             <label for="radio-five">A + A</label>
             <input type="radio" id="radio-six"   name="layout_switch" value="n" />
             <label for="radio-six">A</label>
+          </span>
+          <label>Skeleton on video</label>
+          <span class="switch-field">
+            <input type="radio" id="radio_sk_y" name="skeleton_switch" value="yes"/>
+            <label for="radio_sk_y">Yes</label>
+            <input type="radio" id="radio_sk_n" name="skeleton_switch" value= "no" checked/>
+            <label for="radio_sk_n">No</label>
           </span>
         </div>
         <div>
@@ -691,6 +698,7 @@
     var opt = document.myForm.teacher_option_switch;
     var xad = document.myForm.cutout_switch;
     var gad = document.myForm.glasses_switch;
+    var sad = document.myForm.skeleton_switch;
     var had = document.myForm.hat_switch;
     var prev    = null;
     var prev_1  = null;
@@ -787,6 +795,19 @@
                     prev_1 = this;
                 }
                 useGlass((this.value == "yes") ? true: false);
+                adjustPanel();
+            });
+          }
+        }
+        sad = document.myForm.skeleton_switch;
+        if (sad) {
+          for (var i = 0; i < sad.length; i++) {
+            sad[i].addEventListener('change', function() {
+                (prev_1) ? console.log(prev_1.value): null;
+                if (this !== prev_1) {
+                    prev_1 = this;
+                }
+                useSkeletonOnVideo((this.value == "yes") ? true: false);
                 adjustPanel();
             });
           }

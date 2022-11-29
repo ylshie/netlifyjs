@@ -1184,7 +1184,7 @@ function qRotate(a, b, logme=false)
 // (0, 45, 0) l,r f left 45; ->  ( 0, 0, 0)
 // (0,-90, 0) l,r fright-90; <-  ( 0, 0, 0)
 // (0,-45, 0) l,r fright-45; <-  ( 0, 0, 0)
-function LegRotate(a, b, logme=false)
+function LegRotate_Now(a, b, logme=false)
 {
     var dy= Math.abs(b.y-a.y);
     var dz= Math.abs(b.z-a.z);
@@ -1205,6 +1205,30 @@ function LegRotate(a, b, logme=false)
     }
     
     return {x:x, y:y, z:z};
+}
+
+function LegRotate(a, b, logme=false)
+{
+    var dy= Math.abs(b.y-a.y);
+    var dz= Math.abs(b.z-a.z);
+    var r = Math.sqrt(dy*dy+dz*dz);
+    var d = r; //(b.x>a.x) ? r: -r 
+    var n = get2DAngle(0, a.x, d, b.x);
+
+    var x =-get2DAngle(a.y,a.z,b.y,b.z);
+    var z = (b.x>a.x) ? -Math.abs(n): Math.abs(n);
+    var y = 0;
+    
+    if (logme) console.log("angle=x",A(x),"y",A(y),"z",A(z));
+    if (a.y == b.y && a.x != b.x && a.z != b.z) {
+        console.log("####trap#####")
+        y = (b.z>a.z) ? get2DAngle(a.z,a.x,b.z,b.x): get2DAngle(b.z,b.x,a.z,a.x);
+        z = (b.z>a.z) ? Math.abs(z): -Math.abs(z)
+        x = 0;
+        if (logme) console.log("adjusted=x",x,"y",y,"z",z);
+    }
+    
+    return new Vector(x, y, z);
 }
 
 const zz    = {x: 0, y: 0, z: 0}

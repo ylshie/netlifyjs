@@ -43,6 +43,7 @@ var config = {
     playAtStart: true,
     showGlass: false,
     showHat: false,
+    skeletonAlignVideo: false,
 }
 var DumpMode = false;
 
@@ -317,6 +318,7 @@ const sizeMap = {
 }
 */
 
+var currentTeacher = "avatar.mp4";
 window.changeTeacher = (video_file) => {
     if (sdk.loadVideoSkeleton == null) return;
     if (teacherVideo == null) return;
@@ -324,7 +326,10 @@ window.changeTeacher = (video_file) => {
     var json_path = "./assets/mock-videos/";
     var height  = (video_file == "avatar.mp4")? 1616/1080: ((video_file == "girl.mp4") ?  990/890: 960/1280); // H / W
     var sclaeUp = (video_file == "avatar.mp4")? 1.4: ((video_file == "girl.mp4") ?  2: 3);
+    //var height  = (video_file == "avatar.mp4")? 1: ((video_file == "girl.mp4") ?  990/890: 960/1280); // H / W
+    //var sclaeUp = (video_file == "avatar.mp4")? 1: ((video_file == "girl.mp4") ?  2: 3);
 
+    currentTeacher = video_file;
     teacherVideo.pause();
     teacherVideo.src = json_path + video_file
     
@@ -392,7 +397,11 @@ async function addTeacherVideo(scene) {
     const material = createChromaMaterial(texture, 0x00ff00);
     const plane = new THREE.Mesh(geometry, material);
     //plane.rotation.x = Math.PI/2;
-    plane.position.x = 0.5; //0.6;
+    if (config.skeletonAlignVideo) {
+        plane.position.x = 0; //0.6;
+    } else {
+        plane.position.x = 0.5; //0.6;
+    }
     plane.position.y = 1.0;
     plane.scale.multiplyScalar(1.4)
     
@@ -599,6 +608,9 @@ function playTeacherAnimator() {
     if (! videoElement) return;
     if (! teacherSkeleton) return;
 
+    var height  = (currentTeacher == "avatar.mp4")? 1616/1080: ((currentTeacher == "girl.mp4") ?  990/890: 960/1280); // H / W
+    var sclaeUp = (currentTeacher == "avatar.mp4")? 1.4: ((currentTeacher == "girl.mp4") ?  2: 3);
+    
     //console.log("play teacher")
     sdk.playResult(videoElement, teacherSkeleton, (results) => {
         var  vrm_results= results;
@@ -612,19 +624,44 @@ function playTeacherAnimator() {
         score_teacher_right = playRightHand(vrm_results, teacher_right)
         let teacherCanvas = document.querySelector('#teacherCanvas');
 
-        if (layout == "n") {
-            teacherCanvas.style.left = "35%";
-        } else {
-            teacherCanvas.style.left = "70%";
+        if (config.skeletonAlignVideo) {
+            const videoWidth    = parseInt(rendererTeacher.domElement.style.width);
+            const skWidth       = videoWidth / height;
+            const videoLeft     = parseInt(rendererTeacher.domElement.style.left);
+            const skLeft        = videoLeft + (videoWidth - skWidth) / 2;
+            teacherCanvas.style.left     = skLeft;
+            teacherCanvas.style.top      = rendererTeacher.domElement.style.top;
+            teacherCanvas.style.width    = skWidth;
+            teacherCanvas.style.height   = rendererTeacher.domElement.style.height;
+            //teacherCanvas.width     = skWidth; 
+            //teacherCanvas.height    = rendererTeacher.domElement.style.height;
+            teacherCanvas.style.zIndex  = 1;
+            teacherPlane.position.x     = 0;
+            teacherCanvas.width     = parseInt(teacherCanvas.style.width);
+            teacherCanvas.height    = parseInt(teacherCanvas.style.height);
+        } 
+        else {
+            teacherCanvas.style.zIndex  = 0;
+            teacherPlane.position.x     = 0.5;
+            teacherCanvas.width     = 400;
+            teacherCanvas.height    = 600;
+
+            if (layout == "n") {
+                teacherCanvas.style.left = "35%";
+            } else {
+                teacherCanvas.style.left = "70%";
+            }
         }
 
         if (teacherCanvas && teacherVideo) { 
-            if (teacherVideo.videoWidth > 1000) {
-                teacherCanvas.style.width  = teacherVideo.videoWidth / 4;
-                teacherCanvas.style.height = teacherVideo.videoHeight / 4;
-            } else {
-                teacherCanvas.style.width  = teacherVideo.videoWidth / 2;
-                teacherCanvas.style.height = teacherVideo.videoHeight / 2;
+            if (! config.skeletonAlignVideo) {
+                if (teacherVideo.videoWidth > 1000) {
+                    teacherCanvas.style.width  = teacherVideo.videoWidth / 4;
+                    teacherCanvas.style.height = teacherVideo.videoHeight / 4;
+                } else {
+                    teacherCanvas.style.width  = teacherVideo.videoWidth / 2;
+                    teacherCanvas.style.height = teacherVideo.videoHeight / 2;
+                }
             }
             //console.log(sk_results);
             //sdk.drawSkeleton(teacherCanvas, sk_results);
@@ -915,6 +952,9 @@ function setMirror(newValue) {
 function useGlass(use) {
     config.showGlass = use;
 };
+function useSkeletonOnVideo(use) {
+    config.skeletonAlignVideo = use;
+};
 function useHat(use) {
     config.showHat = use;
 };
@@ -927,7 +967,8 @@ function adjustPanel() {
     //let videoElement = document.querySelector("video");
     let videoElement    = findMindARVideo();
     let videoCanvas     = document.querySelector(".output_canvas");
-    let videoControls   = document.querySelector("#video_controls")
+    let videoControls   = document.querySelector("#video_controls");
+    let elmSkeletonT    = document.querySelector("#teacherCanvas")
 
     //videoElement.style.visibility = "hidden"
     videoElement.style.zIndex = -3
@@ -966,6 +1007,7 @@ window.bindVideoControl = bindVideoControl;
 window.useGlass = useGlass;
 window.useHat = useHat;
 window.useCutOut = useCutOut;
+window.useSkeletonOnVideo = useSkeletonOnVideo;
 
 function bindVideoControl(type, elm) {
     var video = sdk.sourceVideo();
