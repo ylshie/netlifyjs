@@ -949,6 +949,18 @@ function setMirror(newValue) {
     mirror = newValue;
 }
 
+function setBackImage(value) {
+    let elm = document.querySelector("#right_panel");
+    var image;
+    
+         if (value == "1") image = "url('./assets/1129BG-1.png')";
+    else if (value == "2") image = "url('./assets/1129BG-2.png')"
+    else if (value == "3") image = "url('./assets/1129BG-3.png')"
+                      else image = "url('./assets/concert_stage_2.jpg')"
+    
+    elm.style.backgroundImage = image;
+}
+
 function useGlass(use) {
     config.showGlass = use;
 };
@@ -1003,6 +1015,7 @@ window.setLayout = setLayout;
 window.adjustPanel = adjustPanel;
 window.setOpacity = setOpacity;
 window.setMirror = setMirror;
+window.setBackImage = setBackImage;
 window.bindVideoControl = bindVideoControl;
 window.useGlass = useGlass;
 window.useHat = useHat;

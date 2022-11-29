@@ -584,6 +584,17 @@
             <input type="radio" id="radio_sk_n" name="skeleton_switch" value= "no" checked/>
             <label for="radio_sk_n">No</label>
           </span>
+          <label>Background</label>
+          <span class="switch-field">
+            <input type="radio" id="radio_bk_0" name="background_switch" value="0" checked/>
+            <label for="radio_bk_0">Current</label>
+            <input type="radio" id="radio_bk_1" name="background_switch" value="1" />
+            <label for="radio_bk_1">BG-1</label>
+            <input type="radio" id="radio_bk_2" name="background_switch" value="2" />
+            <label for="radio_bk_2">BG-2</label>
+            <input type="radio" id="radio_bk_3" name="background_switch" value="3" />
+            <label for="radio_bk_3">BG-3</label>
+          </span>
         </div>
         <div>
           <label>Glasses</label>
@@ -693,6 +704,7 @@
     var IsFullscreen = false;
     var IsPanel = false;
 
+    var bad = document.myForm.background_switch
     var rad = document.myForm.layout_switch;
     var tad = document.myForm.teacher_switch;
     var opt = document.myForm.teacher_option_switch;
@@ -774,6 +786,17 @@
             adjustPanel();
         });
       }
+    }
+    for (let i = 0; i < bad.length; i++) {
+        bad[i].addEventListener('change', function() {
+            (prev) ? console.log(prev.value): null;
+            if (this !== prev) {
+                prev = this;
+            }
+            console.log("change to " + this.value)
+            setBackImage(this.value);
+            adjustPanel();
+        });
     }
     setTimeout(function () {
         for (var i = 0; i < xad.length; i++) {
