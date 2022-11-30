@@ -182,6 +182,7 @@ const ashtraPath = "./assets/models/girl-Avatar-ok.vrm";
 //const ashtraPath = "./assets/models/ソーマ.vrm";
 //const teacherPath = "./assets/models/ソーマ.vrm";
 const teacherPath = "./assets/models/darkness.vrm";
+//const teacherPath = "./assets/models/cici.vrm";
 //const teacherPath = "./assets/models/Power.vrm";
 //const teacherPath = "./assets/models/ash.vrm";
 //const ashtraPath = "./assets/models/Ashtra.vrm"
@@ -956,6 +957,8 @@ function setBackImage(value) {
          if (value == "1") image = "url('./assets/1129BG-1.png')";
     else if (value == "2") image = "url('./assets/1129BG-2.png')"
     else if (value == "3") image = "url('./assets/1129BG-3.png')"
+    else if (value == "g") image = "url('./assets/greenBG.jpeg')"
+    else if (value == "b") image = "url('./assets/blueBG.jpeg')"
                       else image = "url('./assets/concert_stage_2.jpg')"
     
     elm.style.backgroundImage = image;
