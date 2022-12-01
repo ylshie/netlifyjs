@@ -957,9 +957,13 @@ function setBackImage(value) {
          if (value == "1") image = "url('./assets/1129BG-1.png')";
     else if (value == "2") image = "url('./assets/1129BG-2.png')"
     else if (value == "3") image = "url('./assets/1129BG-3.png')"
+    else if (value == "4") image = "url('./assets/1129BG-4.png')"
+    else if (value == "5") image = "url('./assets/1129BG-5.png')"
     else if (value == "g") image = "url('./assets/greenBG.jpeg')"
     else if (value == "b") image = "url('./assets/blueBG.jpeg')"
-                      else image = "url('./assets/concert_stage_2.jpg')"
+    else if (value == "l") image = "url('./assets/concert_stage_2.jpg')"
+    else if (value == "m") image = "url('./assets/map.jpeg')"
+                      else image = "url('./assets/map.jpeg')"
     
     elm.style.backgroundImage = image;
 }
