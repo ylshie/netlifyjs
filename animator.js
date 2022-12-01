@@ -359,14 +359,14 @@ window.changeTeacher = (video_file) => {
     var elmVid  = document.querySelector(".output_canvas")
 
     if (config.specialMode) {
-        //elmSK.style.visibility      = "hidden";
-        //elmVRM.style.visibility     = "hidden";
+        elmSK.style.visibility      = "visible";
+        elmVRM.style.visibility     = "visible";
         elmUser.style.visibility    = "hidden";
 
-        elmbat.style.visibility    = "hidden";
+        //elmbat.style.visibility    = "hidden";
         elmVid.style.visibility    = "hidden";
     } else {
-        elmbat.style.visibility    = "visible";
+        //elmbat.style.visibility    = "visible";
         elmVid.style.visibility    = "visible";
         if (video_file == "girl.mp4") {
             elmSK.style.visibility      = "hidden";
@@ -980,11 +980,11 @@ function setBackImage(value) {
     let elm = document.querySelector("#right_panel");
     var image;
     
-         if (value == "1") image = "url('./assets/1129BG-1.png')";
-    else if (value == "2") image = "url('./assets/1129BG-2.png')"
+         if (value == "1") image = "url('./assets/1129BG-1.jpg')";
+    else if (value == "2") image = "url('./assets/1129BG-2.jpg')"
     else if (value == "3") image = "url('./assets/1129BG-3.png')"
     else if (value == "4") image = "url('./assets/1129BG-4.png')"
-    else if (value == "5") image = "url('./assets/1129BG-5.png')"
+    else if (value == "5") image = "url('./assets/1129BG-5.jpg')"
     else if (value == "g") image = "url('./assets/greenBG.jpeg')"
     else if (value == "b") image = "url('./assets/blueBG.jpeg')"
     else if (value == "l") image = "url('./assets/concert_stage_2.jpg')"
