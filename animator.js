@@ -44,6 +44,7 @@ var config = {
     showGlass: false,
     showHat: false,
     skeletonAlignVideo: false,
+    specialMode: false,
 }
 var DumpMode = false;
 
@@ -324,6 +325,12 @@ window.changeTeacher = (video_file) => {
     if (sdk.loadVideoSkeleton == null) return;
     if (teacherVideo == null) return;
 
+    if (video_file == "test") {
+        config.specialMode = true;
+        video_file = "C0017.mp4";
+    } else {
+        config.specialMode = false;
+    }
     var json_path = "./assets/mock-videos/";
     var height  = (video_file == "avatar.mp4")? 1616/1080: ((video_file == "girl.mp4") ?  990/890: 960/1280); // H / W
     var sclaeUp = (video_file == "avatar.mp4")? 1.4: ((video_file == "girl.mp4") ?  2: 3);
@@ -348,15 +355,28 @@ window.changeTeacher = (video_file) => {
     var elmSK   = document.querySelector("#teacherCanvas");
     var elmVRM  = rendererTeacher.domElement;
     var elmUser = rendererUser.domElement;
+    var elmbat  = document.querySelector("#new_battery_panel")
+    var elmVid  = document.querySelector(".output_canvas")
 
-    if (video_file == "girl.mp4") {
-        elmSK.style.visibility      = "hidden";
-        elmVRM.style.visibility     = "hidden";
+    if (config.specialMode) {
+        //elmSK.style.visibility      = "hidden";
+        //elmVRM.style.visibility     = "hidden";
         elmUser.style.visibility    = "hidden";
+
+        elmbat.style.visibility    = "hidden";
+        elmVid.style.visibility    = "hidden";
     } else {
-        elmSK.style.visibility      = "visible";
-        elmVRM.style.visibility     = "visible";
-        elmUser.style.visibility    = "visible";
+        elmbat.style.visibility    = "visible";
+        elmVid.style.visibility    = "visible";
+        if (video_file == "girl.mp4") {
+            elmSK.style.visibility      = "hidden";
+            elmVRM.style.visibility     = "hidden";
+            elmUser.style.visibility    = "hidden";
+        } else {
+            elmSK.style.visibility      = "visible";
+            elmVRM.style.visibility     = "visible";
+            elmUser.style.visibility    = "visible";
+        }
     }
 
     sdk.loadVideoSkeleton(json_path,(json) => {
@@ -398,7 +418,7 @@ async function addTeacherVideo(scene) {
     const material = createChromaMaterial(texture, 0x00ff00);
     const plane = new THREE.Mesh(geometry, material);
     //plane.rotation.x = Math.PI/2;
-    if (config.skeletonAlignVideo) {
+    if (config.skeletonAlignVideo || config.specialMode) {
         plane.position.x = 0; //0.6;
     } else {
         plane.position.x = 0.5; //0.6;
@@ -625,7 +645,7 @@ function playTeacherAnimator() {
         score_teacher_right = playRightHand(vrm_results, teacher_right)
         let teacherCanvas = document.querySelector('#teacherCanvas');
 
-        if (config.skeletonAlignVideo) {
+        if (config.skeletonAlignVideo || config.specialMode) {
             const videoWidth    = parseInt(rendererTeacher.domElement.style.width);
             const skWidth       = videoWidth / height;
             const videoLeft     = parseInt(rendererTeacher.domElement.style.left);
@@ -655,7 +675,7 @@ function playTeacherAnimator() {
         }
 
         if (teacherCanvas && teacherVideo) { 
-            if (! config.skeletonAlignVideo) {
+            if (! config.skeletonAlignVideo && (! config.specialMode)) {
                 if (teacherVideo.videoWidth > 1000) {
                     teacherCanvas.style.width  = teacherVideo.videoWidth / 4;
                     teacherCanvas.style.height = teacherVideo.videoHeight / 4;
@@ -853,7 +873,9 @@ function adjustUserVideo(elm) {
         posTop = winHeight / 2;
     }
 
-    if (layout == "a" || layout == "n") {
+    if (config.specialMode) {
+        elm.style.visibility = "hidden";
+    } else if (layout == "a" || layout == "n") {
         elm.style.visibility = "hidden";
     } else {
         if (elm != video) elm.style.visibility = "visible";
@@ -921,10 +943,14 @@ function adjustUserAvatar(rendererUser, orbitCameraUser) {
     rendererUser.domElement.style.top   = posTop;
     rendererUser.setSize(targetWidth, targetHeight);
 
-    if (layout == "n") {
+    if (config.specialMode) {
         rendererUser.domElement.style.visibility = "hidden";
     } else {
-        rendererUser.domElement.style.visibility = "visible";
+        if (layout == "n") {
+            rendererUser.domElement.style.visibility = "hidden";
+        } else {
+            rendererUser.domElement.style.visibility = "visible";
+        }
     }
     if (userVrm) {
         if (screen.width > screen.height) {
@@ -1003,12 +1029,13 @@ function adjustPanel() {
     
     adjustUserAvatar(rendererUser, orbitCameraUser)
     
-    const teacherLeft   = (layout == "n") ? window.innerWidth / 6: window.innerWidth / 2;
-    const teacherWidth  = window.innerWidth / 2;
-    const teacherHeight = window.innerHeight;
+    const teacherLeft   = (layout == "n" || config.specialMode) ? window.innerWidth / 4: window.innerWidth / 2;
+    const teacherTop    = (config.specialMode) ? window.innerHeight * 0.1: 0;
+    const teacherWidth  = (config.specialMode) ?  window.innerWidth * 0.3: window.innerWidth / 2;
+    const teacherHeight = (config.specialMode) ? window.innerHeight * 0.6: window.innerHeight;
     //rendererUser.setSize(window.innerWidth / 3, window.innerHeight / 2);
     rendererTeacher.domElement.style.left   = teacherLeft;
-    rendererTeacher.domElement.style.top    = 0;
+    rendererTeacher.domElement.style.top    = teacherTop;
     rendererTeacher.setSize(teacherWidth, teacherHeight)
 
     //orbitCameraUser.aspect      = (window.innerWidth / 3) / (window.innerHeight / 2);
