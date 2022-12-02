@@ -589,6 +589,13 @@
             <input type="radio" id="radio_sk_n" name="skeleton_switch" value= "no" checked/>
             <label for="radio_sk_n">No</label>
           </span>
+          <label>Extra video</label>
+          <span class="switch-field">
+            <input type="radio" id="radio_ast_y" name="assist_switch" value="yes"/>
+            <label for="radio_ast_y">Yes</label>
+            <input type="radio" id="radio_ast_n" name="assist_switch" value= "no" checked/>
+            <label for="radio_ast_n">No</label>
+          </span>
           <label>Background</label>
           <span class="switch-field">
             <input type="radio" id="radio_bk_m" name="background_switch" value="m" checked/>
@@ -726,6 +733,7 @@
     var xad = document.myForm.cutout_switch;
     var gad = document.myForm.glasses_switch;
     var sad = document.myForm.skeleton_switch;
+    var aad = document.myForm.assist_switch;
     var had = document.myForm.hat_switch;
     var prev    = null;
     var prev_1  = null;
@@ -846,6 +854,19 @@
                     prev_1 = this;
                 }
                 useSkeletonOnVideo((this.value == "yes") ? true: false);
+                adjustPanel();
+            });
+          }
+        }
+        aad = document.myForm.assist_switch;
+        if (aad) {
+          for (var i = 0; i < aad.length; i++) {
+            aad[i].addEventListener('change', function() {
+                (prev_1) ? console.log(prev_1.value): null;
+                if (this !== prev_1) {
+                    prev_1 = this;
+                }
+                useAssistannt((this.value == "yes") ? true: false);
                 adjustPanel();
             });
           }

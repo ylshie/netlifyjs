@@ -45,11 +45,15 @@ var config = {
     showHat: false,
     skeletonAlignVideo: false,
     specialMode: false,
+    useAssistant: false,
 }
 var DumpMode = false;
 
 var teacherVideo = null;
 var teacherPlane = null;
+
+var assistVideo = null;
+var assistPlane = null;
 
 //let x = xxx;
 /* THREEJS WORLD SETUP */
@@ -89,6 +93,17 @@ rendererTeacher.domElement.style.top = 0;
 
 document.body.appendChild(rendererTeacher.domElement);
 
+const rendererAssist= new THREE.WebGLRenderer({ alpha: true });
+const init_width_3  = window.innerWidth / 2;
+const init_height_3 = window.innerHeight;
+rendererAssist.setSize(init_width_3, init_height_3);
+rendererAssist.setPixelRatio(window.devicePixelRatio);
+rendererAssist.domElement.style.position = "absolute"
+rendererAssist.domElement.style.left = window.innerWidth / 2;
+rendererAssist.domElement.style.top = 0;
+
+document.body.appendChild(rendererAssist.domElement);
+
 // camera
 //const cameraVideo = new THREE.PerspectiveCamera(90, init_width / init_height, 0.1, 1000);
 const cameraVideo = new THREE.OrthographicCamera(-1, 1, 1, -1 , 0.1, 1000);
@@ -99,8 +114,10 @@ orbitCameraUser.position.set(0.0, 1.0, 3.5);
 //orbitCamera.position.set(0.0, 1.4, 0.7);
 
 const orbitCameraTeacher = new THREE.PerspectiveCamera(35, init_width_2 / init_height_2, 0.1, 1000);
-//const orbitCameraTeacher = new THREE.PerspectiveCamera(35, 1, 0.1, 1000);
 orbitCameraTeacher.position.set(0.0, 1.0, 4.0);
+
+const orbitCameraAssist = new THREE.PerspectiveCamera(35, init_width_2 / init_height_2, 0.1, 1000);
+orbitCameraAssist.position.set(0.0, 1.0, 4.0);
 
 // controls
 //arthur
@@ -114,6 +131,7 @@ orbitControls.update();
 const sceneVideo    = new THREE.Scene();
 const sceneUser     = new THREE.Scene();
 const sceneTeacher  = new THREE.Scene();
+const sceneAssist   = new THREE.Scene();
 
 // light
 const lightVideo = new THREE.DirectionalLight(0xffffff);
@@ -127,6 +145,10 @@ sceneUser.add(lightUser);
 const lightTeacher = new THREE.DirectionalLight(0xffffff);
 lightTeacher.position.set(1.0, 1.0, 1.0).normalize();
 sceneTeacher.add(lightTeacher);
+
+const lightAssist = new THREE.DirectionalLight(0xffffff);
+lightAssist.position.set(1.0, 1.0, 1.0).normalize();
+sceneAssist.add(lightAssist);
 
 // Main Render Loop
 const clock_1 = new THREE.Clock();
@@ -342,7 +364,11 @@ window.changeTeacher = (video_file) => {
     //var height  = (video_file == "avatar.mp4")? 1: ((video_file == "girl.mp4") ?  990/890: 960/1280); // H / W
     //var sclaeUp = (video_file == "avatar.mp4")? 1: ((video_file == "girl.mp4") ?  2: 3);
 
+    //showAssist(config.useAssistant)
+
     currentTeacher = video_file;
+    assistVideo.pause();
+    assistVideo.currentTime = 0;
     teacherVideo.pause();
     teacherVideo.src = json_path + video_file
     
@@ -364,10 +390,12 @@ window.changeTeacher = (video_file) => {
 
     var elmSK   = document.querySelector("#teacherCanvas");
     var elmVRM  = rendererTeacher.domElement;
+    var elmAST  = rendererAssist.domElement;
     var elmUser = rendererUser.domElement;
     var elmbat  = document.querySelector("#new_battery_panel")
     var elmVid  = document.querySelector(".output_canvas")
 
+    elmAST.style.visibility     = "visible";
     if (config.specialMode) {
         elmSK.style.visibility      = "visible";
         elmVRM.style.visibility     = "visible";
@@ -395,6 +423,7 @@ window.changeTeacher = (video_file) => {
 
         if (config.playAtStart) {
             teacherVideo.play();
+            assistVideo.play();
         }
     });
 }
@@ -449,8 +478,45 @@ async function addTeacherVideo(scene) {
     setTimeout(() => teacherVideo.muted = false, 5000);
 }
 
+function showAssist(show) {
+    assistPlane.visible = show;
+    //assistVideo.muted = ! show;
+    assistVideo.play();
+    rendererAssist.domElement.visibility = (show)? "visible": "hidden"
+}
+
+async function addAssistVideo(scene) {
+    const video = document.createElement("video");
+    video.crossOrigin = "anonymous";
+    video.src = "./assets/mock-videos/tk_4.mp4"
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+
+    video.pause();
+    const texture = new THREE.VideoTexture(video);
+    const geometry = new THREE.PlaneGeometry(1, 720/960);
+    const material = createChromaMaterial(texture, 0x00ff00);
+    const plane = new THREE.Mesh(geometry, material);
+    
+    plane.position.x =   0; //0.6;
+    plane.position.y = 1.0;
+    plane.scale.multiplyScalar(3.0)
+    
+    assistPlane = plane;
+    plane.visible = false;   //config.showTeacherVideo;
+    scene.add(plane);
+    
+    //video.play();
+    assistVideo = video;
+    setTimeout(() => assistVideo.muted = false, 5000);
+}
+
 if (detect == null) {
-    setTimeout(() => addTeacherVideo(sceneTeacher), 1000);
+    setTimeout(() => {
+        addTeacherVideo(sceneTeacher);
+        addAssistVideo(sceneAssist);
+    }, 1000);
 }
 
 var played = false;
@@ -866,6 +932,7 @@ sdk.onCallback = (results) => {
     playTeacherAnimator()
     rendererUser.render(sceneUser, orbitCameraUser);
     rendererTeacher.render(sceneTeacher, orbitCameraTeacher);
+    rendererAssist.render(sceneAssist, orbitCameraAssist);
     rendererVideo.render(sceneVideo, cameraVideo);
 }
 
@@ -1014,6 +1081,10 @@ function useGlass(use) {
 function useSkeletonOnVideo(use) {
     config.skeletonAlignVideo = use;
 };
+function useAssistannt(use) {
+    config.useAssistant = use;
+    showAssist(config.useAssistant)
+};
 function useHat(use) {
     config.showHat = use;
 };
@@ -1043,7 +1114,9 @@ function adjustPanel() {
     
     adjustUserAvatar(rendererUser, orbitCameraUser)
     
-    const teacherLeft   = (layout == "n" || config.specialMode) ? window.innerWidth / 4: window.innerWidth / 2;
+    const teacherLeft   = (layout == "n" || config.specialMode) 
+                          ? (config.useAssistant)? window.innerWidth / 10: window.innerWidth / 4
+                          : window.innerWidth / 2;
     const teacherTop    = (config.specialMode) ? window.innerHeight * 0.1: 0;
     const teacherWidth  = (config.specialMode) ?  window.innerWidth * 0.3: window.innerWidth / 2;
     const teacherHeight = (config.specialMode) ? window.innerHeight * 0.6: window.innerHeight;
@@ -1069,6 +1142,7 @@ window.useGlass = useGlass;
 window.useHat = useHat;
 window.useCutOut = useCutOut;
 window.useSkeletonOnVideo = useSkeletonOnVideo;
+window.useAssistannt = useAssistannt;
 
 function bindVideoControl(type, elm) {
     var video = sdk.sourceVideo();
