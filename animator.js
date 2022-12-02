@@ -325,14 +325,19 @@ window.changeTeacher = (video_file) => {
     if (sdk.loadVideoSkeleton == null) return;
     if (teacherVideo == null) return;
 
-    if (video_file == "test") {
+    if (video_file == "mindar") {
+        config.specialMode = true;
+        video_file = "C0029.mp4";
+    } else if (video_file == "test") {
         config.specialMode = true;
         video_file = "C0017.mp4";
     } else {
         config.specialMode = false;
     }
     var json_path = "./assets/mock-videos/";
-    var height  = (video_file == "avatar.mp4")? 1616/1080: ((video_file == "girl.mp4") ?  990/890: 960/1280); // H / W
+    var height  = (video_file == "avatar.mp4")? 1616/1080: 
+                  (video_file == "girl.mp4") ?  990/890:
+                  (video_file == "C0029.mp4") ? 2160/3840: 960/1280; // H / W
     var sclaeUp = (video_file == "avatar.mp4")? 1.4: ((video_file == "girl.mp4") ?  2: 3);
     //var height  = (video_file == "avatar.mp4")? 1: ((video_file == "girl.mp4") ?  990/890: 960/1280); // H / W
     //var sclaeUp = (video_file == "avatar.mp4")? 1: ((video_file == "girl.mp4") ?  2: 3);
@@ -647,15 +652,19 @@ function playTeacherAnimator() {
 
         if (config.skeletonAlignVideo || config.specialMode) {
             const videoWidth    = parseInt(rendererTeacher.domElement.style.width);
-            const skWidth       = videoWidth / height;
+            const videoHeight   = parseInt(rendererTeacher.domElement.style.height);
             const videoLeft     = parseInt(rendererTeacher.domElement.style.left);
-            const skLeft        = videoLeft + (videoWidth - skWidth) / 2;
+            const videoTop      = parseInt(rendererTeacher.domElement.style.top);
+            const skWidth       = (videoWidth / height) * 0.85;   
+            const skHeight      = (videoHeight) * 0.85;         
+            const skLeft        = videoLeft + (videoWidth  - skWidth) / 2;
+            const skTop         = videoTop  + (videoHeight - skHeight) / 2;
+
             teacherCanvas.style.left     = skLeft;
-            teacherCanvas.style.top      = rendererTeacher.domElement.style.top;
+            teacherCanvas.style.top      = skTop;
             teacherCanvas.style.width    = skWidth;
-            teacherCanvas.style.height   = rendererTeacher.domElement.style.height;
-            //teacherCanvas.width     = skWidth; 
-            //teacherCanvas.height    = rendererTeacher.domElement.style.height;
+            teacherCanvas.style.height   = skHeight;
+            
             teacherCanvas.style.zIndex  = 1;
             teacherPlane.position.x     = 0;
             teacherCanvas.width     = parseInt(teacherCanvas.style.width);
