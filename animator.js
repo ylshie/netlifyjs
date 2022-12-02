@@ -348,9 +348,14 @@ window.changeTeacher = (video_file) => {
     
     const texture = new THREE.VideoTexture(teacherVideo);
     const material = createChromaMaterial(texture, 0x00ff00);
+    const videoMaterial =  new THREE.MeshBasicMaterial( {map: texture, side: THREE.FrontSide, toneMapped: false} );
     const geometry = new THREE.PlaneGeometry(1, height);
 
-    teacherPlane.material = material;
+    if (video_file == "C0029.mp4") {
+        teacherPlane.material = videoMaterial;
+    } else {
+        teacherPlane.material = material;
+    }    
     teacherPlane.geometry = geometry;
     teacherPlane.scale.set(1, 1, 1);
     teacherPlane.scale.multiplyScalar(sclaeUp)
