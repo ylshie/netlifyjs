@@ -1,1 +1,0 @@
-/*! For license information please see mindar-image-three.prod.js.LICENSE.txt */

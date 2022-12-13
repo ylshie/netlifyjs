@@ -1,6 +1,6 @@
 import * as Kalidokit from "./Kalidokit"
-import * as xxx from "./sdk/build/araisdk.prod"
-//import * as xxx from "./sdk/build/araisdk.dm"
+//import * as xxx from "./sdk/build/araisdk.prod"
+import * as xxx from "./sdk/build/araisdk.dm"
 //import {currentVrm, updateVRM, loadVRM, setVRM}from "./vrmlib"
 import {checkNodes, updateVRM, loadVRM, addChildItem}from "./vrmlib"
 //import {loadVideo} from './sdk/libs/camera-mock.js';
@@ -523,6 +523,8 @@ var played = false;
 var sdk = new araiSDK();
 var teacherSkeleton = null;
 
+sdk.runAR();
+
 if (detect == null) {
     if (sdk.loadVideoSkeleton) {
         var json_path = "./assets/mock-videos/";
@@ -868,6 +870,7 @@ var pre_user_right  = -1;
 var pre_teacher_left    = -1;
 var pre_teacher_right   = -1;
 sdk.onCallback = (results) => {
+    var ar = sdk.getAR();
     //return; // KILLME
     //console.log("enter callack");
     adjustPanel();
