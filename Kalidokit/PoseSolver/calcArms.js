@@ -189,8 +189,8 @@ function logHand(lm) {
 
     //console.log("dThumbL",dThumbL,"dPinkyL",dPinkyL,"dIndexL",dIndexL)
     //console.log("dThumbR",dThumbR,"dPinkyR",dPinkyR,"dIndexR",dIndexR)
-    console.log("aWristL",AA(aWristL),"aThumbL",AA(aThumbL),"aPinkyL",AA(aPinkyL),"aIndexL",AA(aIndexL))
-    console.log("aWristR",AA(aWristR),"aThumbR",AA(aThumbR),"aPinkyR",AA(aPinkyR),"aIndexR",AA(aIndexR))
+    //console.log("aWristL",AA(aWristL),"aThumbL",AA(aThumbL),"aPinkyL",AA(aPinkyL),"aIndexL",AA(aIndexL))
+    //console.log("aWristR",AA(aWristR),"aThumbR",AA(aThumbR),"aPinkyR",AA(aPinkyR),"aIndexR",AA(aIndexR))
 }
 function calcArms_New2 (lm)  {
     const logme = false;

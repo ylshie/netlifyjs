@@ -55,6 +55,28 @@ var teacherPlane = null;
 var assistVideo = null;
 var assistPlane = null;
 
+const isMobile = (window.innerWidth < 400);
+
+const uilayout = (isMobile) ?   {
+                                    teacherVRM: {
+                                        normal:  {x: 0.4, y:1},
+                                        special: {x: 0.5, y:1},
+                                    },
+                                    teacherSK: {
+                                        normal: {x:0, y:1},
+                                        special: {x: 0.5, y:1},
+                                    },
+                                }
+                            :   {
+                                    teacherVRM: {
+                                        normal: {x:0, y:1},
+                                        special: {x: 0.5, y:1},
+                                    },
+                                    teacherSK: {
+                                        normal: {x:0, y:1},
+                                        special: {x: 0.5, y:1},
+                                    },
+                                }
 //let x = xxx;
 /* THREEJS WORLD SETUP */
 
@@ -82,13 +104,13 @@ rendererUser.domElement.style.top = window.innerHeight / 2;
 document.body.appendChild(rendererUser.domElement);
 
 const rendererTeacher = new THREE.WebGLRenderer({ alpha: true });
-const init_width_2  = window.innerWidth / 2;
+const init_width_2  = isMobile ? window.innerWidth: window.innerWidth / 2;
 const init_height_2 = window.innerHeight;
 rendererTeacher.setSize(init_width_2, init_height_2);
 rendererTeacher.setPixelRatio(window.devicePixelRatio);
 //domAnimator = renderer.domElement;
 rendererTeacher.domElement.style.position = "absolute"
-rendererTeacher.domElement.style.left = window.innerWidth / 2;
+rendererTeacher.domElement.style.left = isMobile ? 0: window.innerWidth / 2;
 rendererTeacher.domElement.style.top = 0;
 
 document.body.appendChild(rendererTeacher.domElement);
@@ -739,13 +761,13 @@ function playTeacherAnimator() {
             teacherCanvas.style.height   = skHeight;
             
             teacherCanvas.style.zIndex  = 1;
-            teacherPlane.position.x     = 0;
+            teacherPlane.position.x     = uilayout.teacherVRM.special.x;    // 0;
             teacherCanvas.width     = parseInt(teacherCanvas.style.width);
             teacherCanvas.height    = parseInt(teacherCanvas.style.height);
         } 
         else {
             teacherCanvas.style.zIndex  = 0;
-            teacherPlane.position.x     = 0.5;
+            teacherPlane.position.x     = uilayout.teacherVRM.normal.x;     //0.5;
             teacherCanvas.width     = 400;
             teacherCanvas.height    = 600;
 
@@ -1119,9 +1141,11 @@ function adjustPanel() {
     
     const teacherLeft   = (layout == "n" || config.specialMode) 
                           ? (config.useAssistant)? window.innerWidth / 10: window.innerWidth / 4
-                          : window.innerWidth / 2;
+                          : isMobile ? 0: window.innerWidth / 2;
     const teacherTop    = (config.specialMode) ? window.innerHeight * 0.1: 0;
-    const teacherWidth  = (config.specialMode) ?  window.innerWidth * 0.3: window.innerWidth / 2;
+    const teacherWidth  = (config.specialMode) ?  window.innerWidth * 0.3: 
+                                      (isMobile ? window.innerWidth
+                                                : window.innerWidth / 2);
     const teacherHeight = (config.specialMode) ? window.innerHeight * 0.6: window.innerHeight;
     //rendererUser.setSize(window.innerWidth / 3, window.innerHeight / 2);
     rendererTeacher.domElement.style.left   = teacherLeft;

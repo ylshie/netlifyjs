@@ -106,3 +106,22 @@ a:hover {
 	border-radius: 0 4px 4px 0;
 }
 
+@media (max-width: 400px){
+  #setPanel {
+    visibility: hidden;
+    font-size: 12px;
+    right: 2px;
+    bottom: 100px;
+    /*height: 200px;*/
+    width: 325px;
+    z-index: 5;
+  }
+
+  #setPanel input {
+    font-size: 12px;
+  }
+
+  .switch-field label {
+    padding: 3px 4px;
+  }
+}

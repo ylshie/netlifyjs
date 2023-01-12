@@ -287,7 +287,7 @@ function calcHips_New(lm3d, lm2d, debug=false)  {
         hips.rotation   = {x: 0, y: 0, z: 0};
         spine           = {x: 0, y: 0, z: 0};
     }
-    console.log("hips",AA(hips.rotation),"spine",AA(spine));
+    //console.log("hips",AA(hips.rotation),"spine",AA(spine));
     //if (logme) console.log("lm11",PP(lm2d[11]),"lm12",PP(lm2d[12]),"lm23",PP(lm2d[23]),"lm24",PP(lm2d[24]))
     //if (logme) console.log("hip","position",PP(hips.position),"rotation",NN(hips.rotation))
     //if (logme) console.log("spine","rotation",NN(spine))
